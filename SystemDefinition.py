@@ -17,6 +17,9 @@ class LinearSystem:
         self.A = state_matrix
         self.B = input_matrix
         self.C = output_matrix
+        self.n = state_matrix.shape[0]
+        self.q = output_matrix.shape[0]
+        self.p = input_matrix.shape[1]
 
     def linear_system_response(self, input_sequence: np.ndarray, initial_state: np.ndarray):
         """ Implementation of the linear dynamic discrete system in state space.
@@ -25,19 +28,25 @@ class LinearSystem:
         x_{k+1} = Ax_{k} + Bu_{k}
         y_{k} = Cx_{k},
         where A is the state matrix, B is input matrix and C is output matrix.
+        The function ignores the first output y_{1} because it's independent for known input.
+        The function return two same length array i.e.
+        [u_{1}, u_{2}, ..., u_{N-1}] -> length N - 1
+        [x_{1}, x_{2}, ..., x_{N}]   -> length N
+        [y_{2}, y_{3}, ..., y_{N}]   -> length N - 1
 
-        :param input_sequence: array of u_{k} for k = 0, 1, 2, ... N - 1.
+        :param input_sequence: array of u_{k} for k = 1, 2, ..., N - 1.
         :type input_sequence: np.ndarray
-        :param initial_state: initial state of system x_{0}.
+        :param initial_state: the initial state of the system x_{1}.
         :type initial_state: np.ndarray
-        :return: output sequence of the linear system.
+        :return: the output sequence of the linear system.
         :rtype: np.ndarray
         """
-        y = []
-        x = [initial_state]
-        for k in range(input_sequence.shape[1]):
-            x.append(np.dot(self.A, x[:, k]) + np.dot(self.C, input_sequence[:, k]))
-            y.append(np.dot(self.C, x[:, k]))
-        return y
-
-
+        number_of_output_samples = input_sequence.shape[1]
+        output_sequence = np.zeros((self.q, number_of_output_samples))
+        state_space_sequence = np.zeros((self.n, number_of_output_samples + 1))
+        state_space_sequence[:, 0] = initial_state
+        for k in range(number_of_output_samples):
+            state_space_sequence[:, k + 1: k + 2] = self.A @ state_space_sequence[:, k: k + 1]\
+                                                    + self.B @ input_sequence[:, k: k + 1]
+            output_sequence[:, k] = self.C @ state_space_sequence[:, k + 1: k + 2]
+        return output_sequence
