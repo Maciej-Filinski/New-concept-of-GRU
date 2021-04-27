@@ -1,8 +1,7 @@
-from tensorflow.keras import backend as K
-from tensorflow.keras import layers
 from tensorflow import keras
 import tensorflow as tf
 
+STATE_EXTENSION = 5
 
 
 class NewGRU(keras.layers.Layer):
@@ -31,14 +30,15 @@ class NewGRU(keras.layers.Layer):
         return output, new_states
 
     def _build_node_1(self, input_shape):
-        self.node_1_input_kernel = self.add_weight(shape=(input_shape + self.state_length, 20 * self.state_length),
+        self.node_1_input_kernel = self.add_weight(shape=(input_shape + self.state_length,
+                                                          STATE_EXTENSION * self.state_length),
                                                    initializer="uniform",
                                                    name="node_1_input_kernel")
-        self.node_1_input_bias = self.add_weight(shape=(20 * self.state_length,),
+        self.node_1_input_bias = self.add_weight(shape=(STATE_EXTENSION * self.state_length,),
                                                  initializer="uniform",
                                                  name="node_1_input_bias")
 
-        self.node_1_output_kernel = self.add_weight(shape=(20 * self.state_length, self.state_length),
+        self.node_1_output_kernel = self.add_weight(shape=(STATE_EXTENSION * self.state_length, self.state_length),
                                                     initializer="uniform",
                                                     name="node_1_output_kernel")
         self.node_1_output_bias = self.add_weight(shape=(self.state_length,),
@@ -51,13 +51,14 @@ class NewGRU(keras.layers.Layer):
         return output_step_2
 
     def _build_node_2(self, input_shape):
-        self.node_2_input_kernel = self.add_weight(shape=(input_shape + self.state_length, 20 * self.state_length),
+        self.node_2_input_kernel = self.add_weight(shape=(input_shape + self.state_length,
+                                                          STATE_EXTENSION * self.state_length),
                                                    initializer="uniform",
                                                    name="node_2_input_kernel")
-        self.node_2_input_bias = self.add_weight(shape=(20 * self.state_length,),
+        self.node_2_input_bias = self.add_weight(shape=(STATE_EXTENSION * self.state_length,),
                                                  initializer="uniform",
                                                  name="node_2_input_bias")
-        self.node_2_output_kernel = self.add_weight(shape=(20 * self.state_length, self.state_length),
+        self.node_2_output_kernel = self.add_weight(shape=(STATE_EXTENSION * self.state_length, self.state_length),
                                                     initializer="uniform",
                                                     name="node_2_output_kernel")
         self.node_2_output_bias = self.add_weight(shape=(self.state_length,),
@@ -70,13 +71,13 @@ class NewGRU(keras.layers.Layer):
         return output_step_2
 
     def _build_node_3(self):
-        self.node_3_input_kernel = self.add_weight(shape=(self.state_length, 20 * self.state_length),
+        self.node_3_input_kernel = self.add_weight(shape=(self.state_length, STATE_EXTENSION * self.state_length),
                                                    initializer="uniform",
                                                    name="node_3_input_kernel")
-        self.node_3_input_bias = self.add_weight(shape=(20 * self.state_length,),
+        self.node_3_input_bias = self.add_weight(shape=(STATE_EXTENSION * self.state_length,),
                                                  initializer="uniform",
                                                  name="node_3_input_bias")
-        self.node_3_output_kernel = self.add_weight(shape=(20 * self.state_length, self.number_of_output),
+        self.node_3_output_kernel = self.add_weight(shape=(STATE_EXTENSION * self.state_length, self.number_of_output),
                                                     initializer="uniform",
                                                     name="node_3_output_kernel")
         self.node_3_output_bias = self.add_weight(shape=(self.number_of_output,),

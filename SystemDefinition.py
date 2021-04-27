@@ -30,23 +30,24 @@ class LinearSystem:
         where A is the state matrix, B is input matrix and C is output matrix.
         The function ignores the first output y_{1} because it's independent for known input.
         The function return two same length array i.e.
-        [u_{1}, u_{2}, ..., u_{N-1}] -> length N - 1
-        [x_{1}, x_{2}, ..., x_{N}]   -> length N
-        [y_{2}, y_{3}, ..., y_{N}]   -> length N - 1
+        [u_{1}, u_{2}, ..., u_{N-1}] -> length N
+        [x_{1}, x_{2}, ..., x_{N}]   -> length N + 1
+        [y_{2}, y_{3}, ..., y_{N}]   -> length N
 
-        :param input_sequence: array of u_{k} for k = 1, 2, ..., N - 1.
+        :param input_sequence: array of u_{k} for k = 1, 2, ..., N - 1. shape=(N, p)
         :type input_sequence: np.ndarray
-        :param initial_state: the initial state of the system x_{1}.
+        :param initial_state: the initial state of the system x_{1}. shape=(n, N)
         :type initial_state: np.ndarray
-        :return: the output sequence of the linear system.
+        :return: the output sequence of the linear system. shape=(N, q)
         :rtype: np.ndarray
         """
-        number_of_output_samples = input_sequence.shape[1]
-        output_sequence = np.zeros((self.q, number_of_output_samples))
+        # TODO: Change shape of state matrix form (n, N) to (N, n)
+        number_of_output_samples = input_sequence.shape[0]
+        output_sequence = np.zeros((number_of_output_samples, self.q))
         state_space_sequence = np.zeros((self.n, number_of_output_samples + 1))
-        state_space_sequence[:, 0] = initial_state
+        state_space_sequence[:, 0] = initial_state.reshape(initial_state.shape[0], )
         for k in range(number_of_output_samples):
             state_space_sequence[:, k + 1: k + 2] = self.A @ state_space_sequence[:, k: k + 1]\
-                                                    + self.B @ input_sequence[:, k: k + 1]
-            output_sequence[:, k] = self.C @ state_space_sequence[:, k + 1: k + 2]
+                                                    + self.B @ input_sequence[k: k + 1, :]
+            output_sequence[k, :] = self.C @ state_space_sequence[:, k + 1: k + 2]
         return output_sequence
