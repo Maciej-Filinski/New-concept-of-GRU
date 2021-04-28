@@ -26,7 +26,7 @@ def generate_data_from_nn():
 
 
 def generate_data_from_linear_system(number_of_sample):
-    state_matrix = np.array([[0, 1, 0], [0, 0, 1], [-1, -2, -3]])
+    state_matrix = np.array([[0, 1, 0], [0, 0, 1], [-0.1, -0.2, -0.3]])
     input_matrix = np.array([[0], [0], [1]])
     output_matrix = np.array([[1, 1, 1]])
     system = LinearSystem(state_matrix=state_matrix,
@@ -52,19 +52,14 @@ def prepare_data_for_neural_network(input_sequence, neural_network_input_length)
 
 
 if __name__ == '__main__':
-    input_seq, output_seq = generate_data_from_linear_system(number_of_sample=100)
 
-    nn_input = prepare_data_for_neural_network(input_sequence=input_seq,
-                                               neural_network_input_length=10)
-    print(np.shape(nn_input))
-    print(input_seq)
-    print(nn_input)
-    input()
     state_length = 100
     time_step = 32
-    numbers_of_system_input = 8
-    numbers_of_system_output = 2
-    batch_size = 10032
+    numbers_of_system_input = 1
+    numbers_of_system_output = 1
+    batch_size = 10000 + time_step
+
+
 
     cell = NewGRU(state_length, numbers_of_system_output)
     rnn = keras.layers.RNN(cell)
@@ -72,27 +67,22 @@ if __name__ == '__main__':
     outputs = rnn(input_1)
     model = keras.models.Model(input_1, outputs)
 
-    model.compile(optimizer="adam", loss="mse", metrics=["accuracy"])
+    model.compile(optimizer="adam", loss="mse")
     model.summary()
 
-    inputs, outputs = generate_data_from_nn()
-    outputs = tf.reshape(outputs, [10032, 1, 2])
+    input_seq, outputs = generate_data_from_linear_system(number_of_sample=batch_size)
+    inputs = prepare_data_for_neural_network(input_sequence=input_seq,
+                                             neural_network_input_length=time_step)
+    outputs = outputs[time_step::, :]
+    outputs = 2*outputs/(max(outputs) - min(outputs))
     before_training = model.predict(inputs[8000:10000, :, :])
     print(inputs.shape)
     print(outputs.shape)
-    model.fit(inputs[0:5000, :, :], outputs[0:5000, :, :],
-              epochs=2,
-              validation_data=(inputs[5000:8000, :, :], outputs[5000: 8000, :, :]))
-    predict_output = model.predict(inputs[8000:10000, :, :])
-    tf.print(outputs[8000: 10000, 0, 0])
-    tf.print(predict_output)
-    plt.plot(outputs[8000: 10000, 0, 0], label='real output')
-    plt.plot(predict_output[:, 0], label='predict output')
-    plt.plot(before_training[:, 0], label='before_training')
-    plt.legend()
-    plt.figure()
-    plt.plot(outputs[8000: 10000, 0, 1], label='real output')
-    plt.plot(predict_output[:, 1], label='predict output')
-    plt.plot(before_training[:, 1], label='before_training')
+    model.fit(inputs[0:5000, :, :], outputs[0:5000, :],
+              epochs=10,
+              validation_data=(inputs[5000:8000, :, :], outputs[5000: 8000, :]))
+    predict_output = model.predict(inputs)
+    plt.plot(outputs[8000:8200, :], label='real output')
+    plt.plot(predict_output[8000:8200, :], label='predict output')
     plt.legend()
     plt.show()
