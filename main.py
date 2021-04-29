@@ -4,85 +4,69 @@ import tensorflow as tf
 from SystemDefinition import LinearSystem
 import matplotlib.pyplot as plt
 import numpy as np
+from NeuralNetworkTeacher import TeacherLS
 
 
-def generate_data_from_nn():
-    state_length = 100
-    time_step = 32
-    numbers_of_system_input = 8
-    numbers_of_system_output = 2
-    batch_size = 10032
-
-    cell = NewGRU(state_length, numbers_of_system_output)
+def create_neural_network(number_of_inputs,
+                          number_of_outputs,
+                          time_step,
+                          neural_network_state_length):
+    cell = NewGRU(neural_network_state_length, number_of_outputs)
     rnn = keras.layers.RNN(cell)
-    input_1 = keras.Input((time_step, numbers_of_system_input))
-    outputs = rnn(input_1)
-    model = keras.models.Model(input_1, outputs)
-
-    model.compile(optimizer="adam", loss="mse", metrics=["accuracy"])
-    inputs = tf.random.normal(shape=(batch_size, time_step, numbers_of_system_input), mean=0, stddev=2, dtype='float32')
-    outputs = model(inputs)
-    return inputs, outputs
+    input_1 = keras.Input((time_step, number_of_inputs))
+    output = rnn(input_1)
+    model = keras.models.Model(input_1, output)
+    model.compile(optimizer="adam", loss="mse", metrics='msle')
+    model.summary()
+    return model
 
 
-def generate_data_from_linear_system(number_of_sample):
+def create_linear_system():
     state_matrix = np.array([[0, 1, 0], [0, 0, 1], [-0.1, -0.2, -0.3]])
     input_matrix = np.array([[0], [0], [1]])
     output_matrix = np.array([[1, 1, 1]])
     system = LinearSystem(state_matrix=state_matrix,
                           input_matrix=input_matrix,
                           output_matrix=output_matrix)
-    initial_state = np.array([[0], [0], [0]])
-    input_sequence = np.random.uniform(-1.73, 1.73, size=(number_of_sample, 1))
-    output_sequence = system.linear_system_response(input_sequence=input_sequence,
-                                                    initial_state=initial_state)
-    return input_sequence, output_sequence
-
-
-def prepare_data_for_neural_network(input_sequence, neural_network_input_length):
-    numbers_of_sample = np.shape(input_sequence)[0]
-    numbers_of_input = np.shape(input_sequence)[1]
-    neural_network_input_sequence = np.zeros(shape=(numbers_of_sample - neural_network_input_length,
-                                                    neural_network_input_length,
-                                                    numbers_of_input))
-    for i in range(numbers_of_sample - neural_network_input_length):
-        for j in range(neural_network_input_length):
-            neural_network_input_sequence[i, :, :] = input_sequence[i: i + neural_network_input_length, :]
-    return neural_network_input_sequence
+    init_state = np.array([[0], [0], [0]])
+    return system, init_state
 
 
 if __name__ == '__main__':
-
-    state_length = 100
+    state_length = 50
+    number_of_all_input_batch = 10000
     time_step = 32
-    numbers_of_system_input = 1
-    numbers_of_system_output = 1
-    batch_size = 10000 + time_step
+    number_of_system_sample = number_of_all_input_batch + time_step
+    '''
+    inputs shape = (number_of_all_input_batch, time_step, number_of_system_inputs)
+    output shape = (number_of_all_input_batch. number_of_system_outputs)
+    '''
+    linear_system, initial_state = create_linear_system()
+    teacher = TeacherLS(linear_system, number_of_system_sample, initial_state, time_step)
+    inputs, outputs = teacher.get_data()
+    print(np.shape(inputs))
+    print(np.shape(outputs))
+    train_inputs = inputs[0: int(0.5*number_of_all_input_batch), :, :]
+    train_outputs = outputs[0: int(0.5*number_of_all_input_batch), :]
+    val_inputs = inputs[int(0.5*number_of_all_input_batch): int(0.8*number_of_all_input_batch), :, :]
+    val_outputs = outputs[int(0.5*number_of_all_input_batch): int(0.8*number_of_all_input_batch), :]
+    predict_inputs = inputs[int(0.9*number_of_all_input_batch): number_of_all_input_batch, :, :]
+    real_outputs_for_predict = outputs[int(0.9*number_of_all_input_batch): number_of_all_input_batch, :]
 
-
-
-    cell = NewGRU(state_length, numbers_of_system_output)
-    rnn = keras.layers.RNN(cell)
-    input_1 = keras.Input((time_step, numbers_of_system_input))
-    outputs = rnn(input_1)
-    model = keras.models.Model(input_1, outputs)
-
-    model.compile(optimizer="adam", loss="mse")
-    model.summary()
-
-    input_seq, outputs = generate_data_from_linear_system(number_of_sample=batch_size)
-    inputs = prepare_data_for_neural_network(input_sequence=input_seq,
-                                             neural_network_input_length=time_step)
-    outputs = outputs[time_step::, :]
-    outputs = 2*outputs/(max(outputs) - min(outputs))
-    before_training = model.predict(inputs[8000:10000, :, :])
-    print(inputs.shape)
-    print(outputs.shape)
-    model.fit(inputs[0:5000, :, :], outputs[0:5000, :],
-              epochs=10,
-              validation_data=(inputs[5000:8000, :, :], outputs[5000: 8000, :]))
-    predict_output = model.predict(inputs)
-    plt.plot(outputs[8000:8200, :], label='real output')
-    plt.plot(predict_output[8000:8200, :], label='predict output')
+    number_of_system_inputs = np.shape(inputs)[2]
+    number_of_system_outputs = np.shape(outputs)[1]
+    neural_network = create_neural_network(number_of_inputs=number_of_system_inputs,
+                                           number_of_outputs=number_of_system_outputs,
+                                           time_step=time_step,
+                                           neural_network_state_length=state_length)
+    neural_network.fit(train_inputs,
+                       train_outputs,
+                       epochs=10,
+                       validation_data=(val_inputs, val_outputs))
+    predict_output = neural_network.predict(predict_inputs)
+    print(np.shape(predict_output))
+    print(np.shape(real_outputs_for_predict))
+    plt.plot(real_outputs_for_predict, label='real output')
+    plt.plot(predict_output, label='predict output')
     plt.legend()
     plt.show()
