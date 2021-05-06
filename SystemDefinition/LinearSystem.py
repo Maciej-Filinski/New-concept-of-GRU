@@ -1,9 +1,14 @@
 import numpy as np
+import SystemDefinition.constants as c
 
 
 class LinearSystem:
     """ Definition of the linear dynamical discrete system"""
-    def __init__(self, state_matrix: np.ndarray, input_matrix: np.ndarray, output_matrix: np.ndarray):
+    def __init__(self, state_matrix: np.ndarray,
+                 input_matrix: np.ndarray,
+                 output_matrix: np.ndarray,
+                 process_noise=False,
+                 output_noise=False):
         """ Initiation of the linear dynamical discrete system.
 
         n - number of state variables
@@ -20,6 +25,8 @@ class LinearSystem:
         self.n = state_matrix.shape[0]
         self.q = output_matrix.shape[0]
         self.p = input_matrix.shape[1]
+        self.process_noise = process_noise
+        self.output_noise = output_noise
 
     def linear_system_response(self, input_sequence: np.ndarray, initial_state: np.ndarray):
         """ Implementation of the linear dynamic discrete system in state space.
@@ -49,5 +56,13 @@ class LinearSystem:
         for k in range(number_of_output_samples):
             state_space_sequence[:, k + 1: k + 2] = self.A @ state_space_sequence[:, k: k + 1]\
                                                     + self.B @ input_sequence[k: k + 1, :]
+            if self.process_noise is True:
+                state_space_sequence[:, k + 1: k + 2] += np.random.normal(c.EV_PROCESS_NOISE,
+                                                                          c.VAR_PROCESS_NOISE,
+                                                                          size=(self.n, 1))
             output_sequence[k, :] = self.C @ state_space_sequence[:, k + 1: k + 2]
+            if self.output_noise is True:
+                output_sequence[k, :] += np.random.normal(c.EV_OUTPUT_NOISE,
+                                                          c.VAR_OUTPUT_NOISE,
+                                                          size=(self.q, ))
         return output_sequence

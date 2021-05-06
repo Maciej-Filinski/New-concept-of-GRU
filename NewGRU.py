@@ -46,8 +46,8 @@ class NewGRU(keras.layers.Layer):
                                                   name="node_1_output_bias")
 
     def _call_node_1(self, inputs):
-        output_step_1 = tf.sigmoid(tf.matmul(inputs, self.node_1_input_kernel) + self.node_1_input_bias)
-        output_step_2 = tf.sigmoid(tf.matmul(output_step_1, self.node_1_output_kernel) + self.node_1_output_bias)
+        output_step_1 = tf.tanh(tf.matmul(inputs, self.node_1_input_kernel) + self.node_1_input_bias)
+        output_step_2 = tf.tanh(tf.matmul(output_step_1, self.node_1_output_kernel) + self.node_1_output_bias)
         return output_step_2
 
     def _build_node_2(self, input_shape):
@@ -66,8 +66,8 @@ class NewGRU(keras.layers.Layer):
                                                   name="node_2_output_bias")
 
     def _call_node_2(self, inputs):
-        output_step_1 = tf.sigmoid(tf.matmul(inputs, self.node_2_input_kernel) + self.node_2_input_bias)
-        output_step_2 = tf.sigmoid(tf.matmul(output_step_1, self.node_2_output_kernel) + self.node_2_output_bias)
+        output_step_1 = tf.tanh(tf.matmul(inputs, self.node_2_input_kernel) + self.node_2_input_bias)
+        output_step_2 = tf.tanh(tf.matmul(output_step_1, self.node_2_output_kernel) + self.node_2_output_bias)
         return output_step_2
 
     def _build_node_3(self):
@@ -85,6 +85,6 @@ class NewGRU(keras.layers.Layer):
                                                   name="node_3_output_bias")
 
     def _call_node_3(self, inputs):
-        output_step_1 = tf.sigmoid(tf.matmul(inputs, self.node_3_input_kernel) + self.node_3_input_bias)
+        output_step_1 = tf.tanh(tf.matmul(inputs, self.node_3_input_kernel) + self.node_3_input_bias)
         output_step_2 = tf.matmul(output_step_1, self.node_3_output_kernel) + self.node_3_output_bias
         return output_step_2
