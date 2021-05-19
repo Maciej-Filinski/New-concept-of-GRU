@@ -1,5 +1,6 @@
 import numpy as np
 import SystemDefinition.constants as c
+import matplotlib.pyplot as plt
 
 
 class LinearSystem:
@@ -28,6 +29,8 @@ class LinearSystem:
         self.process_noise = process_noise
         self.output_noise = output_noise
 
+        self.state_space = None
+
     def linear_system_response(self, input_sequence: np.ndarray, initial_state: np.ndarray):
         """ Implementation of the linear dynamic discrete system in state space.
 
@@ -39,7 +42,7 @@ class LinearSystem:
         The function return two same length array i.e.
         [u_{1}, u_{2}, ..., u_{N-1}] -> length N
         [x_{1}, x_{2}, ..., x_{N}]   -> length N + 1
-        [y_{2}, y_{3}, ..., y_{N}]   -> length N
+        [y_{1}, y_{2}, ..., y_{N}]   -> length N + 1
 
         :param input_sequence: array of u_{k} for k = 1, 2, ..., N - 1. shape=(N, p)
         :type input_sequence: np.ndarray
@@ -50,7 +53,7 @@ class LinearSystem:
         """
         # TODO: Change shape of state matrix form (n, N) to (N, n)
         number_of_output_samples = input_sequence.shape[0]
-        output_sequence = np.zeros((number_of_output_samples, self.q))
+        output_sequence = np.zeros((number_of_output_samples + 1, self.q))
         state_space_sequence = np.zeros((self.n, number_of_output_samples + 1))
         state_space_sequence[:, 0] = initial_state.reshape(initial_state.shape[0], )
         for k in range(number_of_output_samples):
@@ -60,9 +63,19 @@ class LinearSystem:
                 state_space_sequence[:, k + 1: k + 2] += np.random.normal(c.EV_PROCESS_NOISE,
                                                                           c.VAR_PROCESS_NOISE,
                                                                           size=(self.n, 1))
-            output_sequence[k, :] = self.C @ state_space_sequence[:, k + 1: k + 2]
+            output_sequence[k, :] = self.C @ state_space_sequence[:, k: k + 1]
             if self.output_noise is True:
                 output_sequence[k, :] += np.random.normal(c.EV_OUTPUT_NOISE,
                                                           c.VAR_OUTPUT_NOISE,
                                                           size=(self.q, ))
+        output_sequence[-1, :] = self.C @ state_space_sequence[:, -2: -1]
+        self.state_space = state_space_sequence
+        fig, ax = plt.subplots(2)
+        ax[0].plot(state_space_sequence[0, 200::])
+        ax[1].plot(state_space_sequence[1, 200::])
+
+
         return output_sequence
+
+    def return_state_space(self):
+        return self.state_space
