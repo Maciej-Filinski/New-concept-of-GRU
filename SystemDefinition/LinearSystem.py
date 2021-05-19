@@ -70,10 +70,9 @@ class LinearSystem:
                                                           size=(self.q, ))
         output_sequence[-1, :] = self.C @ state_space_sequence[:, -2: -1]
         self.state_space = state_space_sequence
-        fig, ax = plt.subplots(2)
+        fig, ax = plt.subplots(2, num='True system state noisy')
         ax[0].plot(state_space_sequence[0, 200::])
         ax[1].plot(state_space_sequence[1, 200::])
-
 
         return output_sequence
 

@@ -22,7 +22,7 @@ class TeacherLS:
         output_sequence = self.system.linear_system_response(input_sequence=input_sequence,
                                                              initial_state=self.initial_state)
         self.input_sequence = input_sequence
-        self.output_sequence = output_sequence[self.neural_network_input_length:-2, :]
+        self.output_sequence = output_sequence[self.neural_network_input_length:-1, :]
 
     def _prepare_data_for_neural_network(self):
         number_of_inputs = np.shape(self.input_sequence)[1]
@@ -36,14 +36,14 @@ class TeacherLS:
     def get_data(self):
         return self.neural_network_input_sequence, self.output_sequence
 
-    def get_data_test(self):
-        k = np.linspace(0, 399, 400)
-        self.number_of_samples = 400
-        input_sequence = np.sin(2*k*np.pi/100)# + np.sin(2*k*np.pi/25)
-        input_sequence = np.reshape(input_sequence, (400, 1))
+    def get_data_test(self, data_length):
+        k = np.array(list(range(data_length)))
+        self.number_of_samples = data_length
+        input_sequence = np.sin(2*k*np.pi/100) + np.sin(2*k*np.pi/25)
+        input_sequence = np.reshape(input_sequence, (data_length, 1))
         output_sequence = self.system.linear_system_response(input_sequence=input_sequence,
                                                              initial_state=self.initial_state)
         self.input_sequence = input_sequence
-        self.output_sequence = output_sequence[self.neural_network_input_length:-2, :]
+        self.output_sequence = output_sequence[self.neural_network_input_length:-1, :]
         self._prepare_data_for_neural_network()
         return self.neural_network_input_sequence, self.output_sequence

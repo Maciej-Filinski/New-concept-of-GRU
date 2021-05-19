@@ -36,8 +36,11 @@ def create_linear_system():
 
 
 if __name__ == '__main__':
+    train_data_length = 2000
+    valid_data_length = 2000
+    test_data_length = 500
     nn_state_length = 2
-    number_of_all_input_batch = 4000
+    number_of_all_input_batch = train_data_length + valid_data_length + test_data_length
     time_step = 200
     number_of_system_sample = number_of_all_input_batch + time_step
     '''
@@ -52,19 +55,19 @@ if __name__ == '__main__':
     # inputs, outputs = teacher.get_data()
     print(np.shape(inputs))
     print(np.shape(outputs))
-    train_inputs = inputs[0: int(0.5*number_of_all_input_batch), :, :]
-    train_outputs = outputs[0: int(0.5*number_of_all_input_batch), :]
-    val_inputs = inputs[int(0.5*number_of_all_input_batch): int(0.8*number_of_all_input_batch), :, :]
-    val_outputs = outputs[int(0.5*number_of_all_input_batch): int(0.8*number_of_all_input_batch), :]
-    predict_inputs = inputs[int(0.9*number_of_all_input_batch): number_of_all_input_batch, :, :]
-    true_output = outputs[int(0.9 * number_of_all_input_batch): number_of_all_input_batch, :]
+    train_inputs = inputs[0: train_data_length, :, :]
+    train_outputs = outputs[0: train_data_length, :]
+    val_inputs = inputs[train_data_length: train_data_length + valid_data_length, :, :]
+    val_outputs = outputs[train_data_length: train_data_length + valid_data_length, :]
+    predict_inputs = inputs[train_data_length + valid_data_length::, :, :]
+    true_output = outputs[train_data_length + valid_data_length::, :]
 
     teacher.system.output_noise = False
     teacher.system.process_noise = False
-    predict_inputs, true_output = teacher.get_data_test()
+    predict_inputs, true_output = teacher.get_data_test(test_data_length)
     teacher.system.output_noise = True
     teacher.system.process_noise = True
-    _, true_output_noisy = teacher.get_data_test()
+    _, true_output_noisy = teacher.get_data_test(test_data_length)
     number_of_system_inputs = np.shape(inputs)[2]
     number_of_system_outputs = np.shape(outputs)[1]
     neural_network = create_neural_network(number_of_inputs=number_of_system_inputs,
@@ -107,39 +110,43 @@ if __name__ == '__main__':
     f = np.array(f)
     c = np.array(c)
     states = np.array(states)
-    fig, ax = plt.subplots(3)
-    ax[0].plot(states[:, 0])
-    ax[1].plot(states[:, 1])
-    ax[2].plot(states[:, 0] + states[:, 1])
-    plt.title('neural network state')
+    fig, ax = plt.subplots(3, num='Last neural network state each step')
+    ax[0].plot(states[:, 0], label='h_1')
+    ax[0].set_title('h_1')
+    ax[1].plot(states[:, 1], label='h_2')
+    ax[1].set_title('h_2')
+    ax[2].plot(states[:, 0] + states[:, 1], label='h_1 + h_2')
+    ax[2].set_title('h_1+h_2')
 
-    fig, ax = plt.subplots(2)
+    fig, ax = plt.subplots(2, num='Last forget each step')
     ax[0].plot(f[:, 0])
+    ax[0].set_ylim([0, 1])
+    ax[0].set_title('f_1')
     ax[1].plot(f[:, 1])
-    plt.title('neural network f')
+    ax[1].set_ylim([0, 1])
+    ax[1].set_title('f_2')
 
-    fig, ax = plt.subplots(2)
+    fig, ax = plt.subplots(2, num='Last candidate each step')
     ax[0].plot(c[:, 0])
+    ax[0].set_title('h_hat_1')
     ax[1].plot(c[:, 1])
-    plt.title('neural network cand')
+    ax[1].set_title('h_hat_2')
 
-    plt.figure()
+    plt.figure(num='Predicted output - train data')
     plt.plot(train_outputs, label='true noisy output')
     plt.plot(predicted_output_train_data, label='predicted output')
     plt.xlabel('n')
     plt.ylabel('y_n')
-    plt.title('Trained on data with process and output noise (random input sequence)')
     plt.legend()
     plt.grid()
 
     predicted_output = neural_network.predict(predict_inputs)
-    plt.figure()
+    plt.figure(num='Predicted output - test data')
     plt.plot(true_output, label='true noisefree output', linewidth=4)
-    plt.plot(predicted_output, label='predicted output')
+    plt.plot(predicted_output, '--', label='predicted output')
     plt.plot(true_output_noisy, label='true noisy output')
     plt.xlabel('n')
     plt.ylabel('y_n')
     plt.grid()
-    plt.title('Trained on data with process and output noise (input = sin(2kpi/10) + sin(2kpi/25))')
     plt.legend()
     plt.show()
