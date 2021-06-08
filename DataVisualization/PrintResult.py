@@ -6,7 +6,8 @@ def print_real_system_state(state):
     fig, ax = plt.subplots(2)
     ax[0].plot(state[0, :])
     ax[1].plot(state[1, :])
-    plt.show()
+
+
 def print_neural_network_state():
     pass
 
@@ -20,6 +21,6 @@ def print_output(true_output, predicted_output):
         ax[i].ylabel('y_n')
     plt.xlabel('n')
     plt.grid()
-    plt.title('Trained on data with process and output noise (input = sin(2kpi/10) + sin(2kpi/25))')
+    plt.title('Trained on test_data with process and output noise (input = sin(2kpi/10) + sin(2kpi/25))')
     plt.legend()
     plt.show()

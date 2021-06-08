@@ -5,7 +5,7 @@ from SystemDefinition import LinearSystem
 import matplotlib.pyplot as plt
 import numpy as np
 from DataPreprocessing.TeacherLS import TeacherLS
-from Visualizations import print_output
+from DataVisualization import print_output
 
 
 def create_neural_network(number_of_inputs,
@@ -132,7 +132,7 @@ if __name__ == '__main__':
     ax[1].plot(c[:, 1])
     ax[1].set_title('h_hat_2')
 
-    plt.figure(num='Predicted output - train data')
+    plt.figure(num='Predicted output - train test_data')
     plt.plot(train_outputs, label='true noisy output')
     plt.plot(predicted_output_train_data, label='predicted output')
     plt.xlabel('n')
@@ -141,7 +141,7 @@ if __name__ == '__main__':
     plt.grid()
 
     predicted_output = neural_network.predict(predict_inputs)
-    plt.figure(num='Predicted output - test data')
+    plt.figure(num='Predicted output - test test_data')
     plt.plot(true_output, label='true noisefree output', linewidth=4)
     plt.plot(predicted_output, '--', label='predicted output')
     plt.plot(true_output_noisy, label='true noisy output')

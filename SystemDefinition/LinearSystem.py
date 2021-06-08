@@ -57,13 +57,14 @@ class LinearSystem:
         state_space_sequence = np.zeros((self.n, number_of_output_samples + 1))
         state_space_sequence[:, 0] = initial_state.reshape(initial_state.shape[0], )
         for k in range(number_of_output_samples):
-            state_space_sequence[:, k + 1: k + 2] = self.A @ state_space_sequence[:, k: k + 1]\
-                                                    + self.B @ input_sequence[k: k + 1, :]
+            state_space_sequence[:, k + 1: k + 2] = self.A @ state_space_sequence[:, k: k + 1] + self.B @ input_sequence[k: k + 1, :]
+            # state_space_sequence[:, k + 1: k + 2] += 0.5 * np.tanh(state_space_sequence[:, k: k + 1])
             if self.process_noise is True:
                 state_space_sequence[:, k + 1: k + 2] += np.random.normal(c.EV_PROCESS_NOISE,
                                                                           c.VAR_PROCESS_NOISE,
                                                                           size=(self.n, 1))
             output_sequence[k, :] = self.C @ state_space_sequence[:, k: k + 1]
+            # output_sequence[k, :] += 2 * state_space_sequence[1, k: k + 1] * state_space_sequence[0, k: k + 1]
             if self.output_noise is True:
                 output_sequence[k, :] += np.random.normal(c.EV_OUTPUT_NOISE,
                                                           c.VAR_OUTPUT_NOISE,

@@ -1,8 +1,7 @@
 from tensorflow import keras
 import tensorflow as tf
 import numpy as np
-
-STATE_EXTENSION = 1
+import NeuralNetwork.constants as c
 
 
 class NewGRU(keras.layers.Layer):
@@ -14,88 +13,196 @@ class NewGRU(keras.layers.Layer):
 
     def build(self, input_shape):
         input_shape = input_shape[1]
-        self._build_node_1(input_shape)
-        self._build_node_2(input_shape)
-        self._build_node_3()
+        self._build_candidate_dnn(input_shape)
+        self._build_forget_dnn(input_shape)
+        self._build_output_dnn()
 
     def call(self, inputs, states):
         states = states[0]
         inputs = tf.concat([inputs, states], -1)
-        node_1_output = self._call_node_1(inputs)
-        node_2_output = self._call_node_2(inputs)
+        node_1_output = self._call_candidate_dnn(inputs)
+        node_2_output = self._call_forget_dnn(inputs)
         part_2 = tf.subtract(node_1_output, states)
         part_2 = tf.math.multiply(node_2_output, part_2)
         new_states = tf.add(part_2, states)
-        output = self._call_node_3(new_states)
+        output = self._call_output_dnn(new_states)
 
-        # tf.print('input = ', inputs, 'old NN state = ', states, 'new NN state = ', new_states)
+        #tf.print('inputs =', inputs)
+        #tf.print('state = ', states)
+        #tf.print('new state = ', new_states)
+        #tf.print('output = ', output)
         return output, new_states
 
-    def _build_node_1(self, input_shape):
-        self.node_1_input_kernel = self.add_weight(shape=(input_shape + self.state_length,
-                                                          STATE_EXTENSION * self.state_length),
-                                                   initializer="uniform",
-                                                   name="node_1_input_kernel")
+    def _build_candidate_dnn(self, input_shape):
+        self.candidate_dnn_input_kernel = self.add_weight(shape=(input_shape + self.state_length,
+                                                                 c.STATE_EXTENSION * self.state_length),
+                                                          initializer="uniform",
+                                                          name="node_1_input_kernel")
+        self.candidate_dnn_input_bias = self.add_weight(shape=(c.STATE_EXTENSION * self.state_length,),
+                                                        initializer="uniform",
+                                                        name="node_1_input_bias")
 
-        self.node_1_input_bias = self.add_weight(shape=(STATE_EXTENSION * self.state_length,),
-                                                 initializer="uniform",
-                                                 name="node_1_input_bias")
+        self.candidate_dnn_hidden_kernel_1 = self.add_weight(shape=(c.STATE_EXTENSION * self.state_length,
+                                                                    c.STATE_EXTENSION**2 * self.state_length),
+                                                             initializer="uniform",
+                                                             name="node_1_input_kernel")
+        self.candidate_dnn_hidden_bias_1 = self.add_weight(shape=(c.STATE_EXTENSION**2 * self.state_length,),
+                                                           initializer="uniform",
+                                                           name="node_1_input_bias")
 
-        self.node_1_output_kernel = self.add_weight(shape=(STATE_EXTENSION * self.state_length, self.state_length),
-                                                    initializer="uniform",
-                                                    name="node_1_output_kernel")
-        self.node_1_output_bias = self.add_weight(shape=(self.state_length,),
-                                                  initializer="uniform",
-                                                  name="node_1_output_bias")
+        self.candidate_dnn_hidden_kernel_2 = self.add_weight(shape=(c.STATE_EXTENSION**2 * self.state_length,
+                                                                    c.STATE_EXTENSION**3 * self.state_length),
+                                                             initializer="uniform",
+                                                             name="node_1_input_kernel")
+        self.candidate_dnn_hidden_bias_2 = self.add_weight(shape=(c.STATE_EXTENSION**3 * self.state_length,),
+                                                           initializer="uniform",
+                                                           name="node_1_input_bias")
 
-    def _call_node_1(self, inputs):
-        output_step_1 = tf.matmul(inputs, self.node_1_input_kernel)
-        output_step_2 = tf.matmul(output_step_1, self.node_1_output_kernel+ self.node_1_output_bias)
-        return output_step_2
+        self.candidate_dnn_hidden_kernel_3 = self.add_weight(shape=(c.STATE_EXTENSION**3 * self.state_length,
+                                                                    c.STATE_EXTENSION**2 * self.state_length),
+                                                             initializer="uniform",
+                                                             name="node_1_input_kernel")
+        self.candidate_dnn_hidden_bias_3 = self.add_weight(shape=(c.STATE_EXTENSION**2 * self.state_length,),
+                                                           initializer="uniform",
+                                                           name="node_1_input_bias")
 
-    def _build_node_2(self, input_shape):
-        self.node_2_input_kernel = self.add_weight(shape=(input_shape + self.state_length,
-                                                          STATE_EXTENSION * self.state_length),
-                                                   initializer="uniform",
-                                                   name="node_2_input_kernel")
-        self.node_2_input_bias = self.add_weight(shape=(STATE_EXTENSION * self.state_length,),
-                                                 initializer="uniform",
-                                                 name="node_2_input_bias")
-        self.node_2_output_kernel = self.add_weight(shape=(STATE_EXTENSION * self.state_length, self.state_length),
-                                                    initializer="uniform",
-                                                    name="node_2_output_kernel")
-        self.node_2_output_bias = self.add_weight(shape=(self.state_length,),
-                                                  initializer="uniform",
-                                                  name="node_2_output_bias")
+        self.candidate_dnn_hidden_kernel_4 = self.add_weight(shape=(c.STATE_EXTENSION**2 * self.state_length,
+                                                                    c.STATE_EXTENSION * self.state_length),
+                                                             initializer="uniform",
+                                                             name="node_1_input_kernel")
+        self.candidate_dnn_hidden_bias_4 = self.add_weight(shape=(c.STATE_EXTENSION * self.state_length,),
+                                                           initializer="uniform",
+                                                           name="node_1_input_bias")
 
-    def _call_node_2(self, inputs):
-        output_step_1 = tf.sigmoid(tf.matmul(inputs, self.node_2_input_kernel) + self.node_2_input_bias)
-        output_step_2 = tf.sigmoid(tf.matmul(output_step_1, self.node_2_output_kernel) + self.node_2_output_bias)
-        return output_step_2
+        self.candidate_dnn_output_kernel = self.add_weight(shape=(c.STATE_EXTENSION * self.state_length,
+                                                                  self.state_length),
+                                                           initializer="uniform",
+                                                           name="node_1_output_kernel")
+        self.candidate_dnn_output_bias = self.add_weight(shape=(self.state_length,),
+                                                         initializer="uniform",
+                                                         name="node_1_output_bias")
 
-    def _build_node_3(self):
-        self.node_3_input_kernel = self.add_weight(shape=(self.state_length, 1),
-                                                   initializer="uniform",
-                                                   name="node_3_input_kernel")
-        self.node_3_input_bias = self.add_weight(shape=(STATE_EXTENSION * self.state_length,),
-                                                 initializer="uniform",
-                                                 name="node_3_input_bias")
-        self.node_3_hidden_kernel = self.add_weight(shape=(STATE_EXTENSION * self.state_length,
-                                                           STATE_EXTENSION * self.state_length),
-                                                    initializer="uniform",
-                                                    name="node_3_hidden_kernel")
-        self.node_3_hidden_bias = self.add_weight(shape=(STATE_EXTENSION * self.state_length,),
-                                                  initializer="uniform",
-                                                  name="node_3_hidden_bias")
-        self.node_3_output_kernel = self.add_weight(shape=(STATE_EXTENSION * self.state_length, self.number_of_output),
-                                                    initializer="uniform",
-                                                    name="node_3_output_kernel")
-        self.node_3_output_bias = self.add_weight(shape=(self.number_of_output,),
-                                                  initializer="uniform",
-                                                  name="node_3_output_bias")
+    def _call_candidate_dnn(self, inputs):
+        outputs = tf.matmul(inputs, self.candidate_dnn_input_kernel) + self.candidate_dnn_input_bias
+        outputs = tf.matmul(outputs, self.candidate_dnn_hidden_kernel_1) + self.candidate_dnn_hidden_bias_1
+        outputs = tf.tanh(tf.matmul(outputs, self.candidate_dnn_hidden_kernel_2) + self.candidate_dnn_hidden_bias_2)
+        outputs = tf.tanh(tf.matmul(outputs, self.candidate_dnn_hidden_kernel_3) + self.candidate_dnn_hidden_bias_3)
+        outputs = tf.matmul(outputs, self.candidate_dnn_hidden_kernel_4) + self.candidate_dnn_hidden_bias_4
+        outputs = tf.matmul(outputs, self.candidate_dnn_output_kernel) + self.candidate_dnn_output_bias
+        return outputs
 
-    def _call_node_3(self, inputs):
-        output_step_1 = tf.matmul(inputs, self.node_3_input_kernel)
-        output_step_2 = tf.matmul(output_step_1, self.node_3_hidden_kernel) + self.node_3_hidden_bias
-        output_step_3 = tf.matmul(output_step_2, self.node_3_output_kernel) + self.node_3_output_bias
-        return output_step_3
+    def _build_forget_dnn(self, input_shape):
+        self.forget_dnn_input_kernel = self.add_weight(shape=(input_shape + self.state_length,
+                                                              c.STATE_EXTENSION * self.state_length),
+                                                       initializer="uniform",
+                                                       name="node_2_input_kernel")
+        self.forget_dnn_input_bias = self.add_weight(shape=(c.STATE_EXTENSION * self.state_length,),
+                                                     initializer="uniform",
+                                                     name="node_2_input_bias")
+
+        self.forget_dnn_hidden_kernel_1 = self.add_weight(shape=(c.STATE_EXTENSION * self.state_length,
+                                                                 c.STATE_EXTENSION**2 * self.state_length),
+                                                          initializer="uniform",
+                                                          name="node_2_hidden_kernel_1")
+        self.forget_dnn_hidden_bias_1 = self.add_weight(shape=(c.STATE_EXTENSION**2 * self.state_length,),
+                                                        initializer="uniform",
+                                                        name="node_2_hidden_bias_1")
+
+        self.forget_dnn_hidden_kernel_2 = self.add_weight(shape=(c.STATE_EXTENSION**2 * self.state_length,
+                                                                 c.STATE_EXTENSION**3 * self.state_length),
+                                                          initializer="uniform",
+                                                          name="node_2_hidden_kernel_2")
+        self.forget_dnn_hidden_bias_2 = self.add_weight(shape=(c.STATE_EXTENSION**3 * self.state_length,),
+                                                        initializer="uniform",
+                                                        name="node_2_hidden_bias_2")
+
+        self.forget_dnn_hidden_kernel_3 = self.add_weight(shape=(c.STATE_EXTENSION**3 * self.state_length,
+                                                                 c.STATE_EXTENSION**2 * self.state_length),
+                                                          initializer="uniform",
+                                                          name="node_2_hidden_kernel_2")
+        self.forget_dnn_hidden_bias_3 = self.add_weight(shape=(c.STATE_EXTENSION**2 * self.state_length,),
+                                                        initializer="uniform",
+                                                        name="node_2_hidden_bias_2")
+
+        self.forget_dnn_hidden_kernel_4 = self.add_weight(shape=(c.STATE_EXTENSION**2 * self.state_length,
+                                                                 c.STATE_EXTENSION * self.state_length),
+                                                          initializer="uniform",
+                                                          name="node_2_hidden_kernel_2")
+        self.forget_dnn_hidden_bias_4 = self.add_weight(shape=(c.STATE_EXTENSION * self.state_length,),
+                                                        initializer="uniform",
+                                                        name="node_2_hidden_bias_2")
+
+        self.forget_dnn_output_kernel = self.add_weight(shape=(c.STATE_EXTENSION * self.state_length,
+                                                               self.state_length),
+                                                        initializer="uniform",
+                                                        name="node_2_output_kernel")
+        self.forget_dnn_output_bias = self.add_weight(shape=(self.state_length,),
+                                                      initializer="uniform",
+                                                      name="node_2_output_bias")
+
+    def _call_forget_dnn(self, inputs):
+        outputs = tf.matmul(inputs, self.forget_dnn_input_kernel) + self.forget_dnn_input_bias
+        outputs = tf.tanh(tf.matmul(outputs, self.forget_dnn_hidden_kernel_1) + self.forget_dnn_hidden_bias_1)
+        outputs = tf.tanh(tf.matmul(outputs, self.forget_dnn_hidden_kernel_2) + self.forget_dnn_hidden_bias_2)
+        outputs = tf.sigmoid(tf.matmul(outputs, self.forget_dnn_hidden_kernel_3) + self.forget_dnn_hidden_bias_3)
+        outputs = tf.sigmoid(tf.matmul(outputs, self.forget_dnn_hidden_kernel_4) + self.forget_dnn_hidden_bias_4)
+        outputs = tf.sigmoid(tf.matmul(outputs, self.forget_dnn_output_kernel) + self.forget_dnn_output_bias)
+        return outputs
+
+    def _build_output_dnn(self):
+        self.output_dnn_input_kernel = self.add_weight(shape=(self.state_length,
+                                                              c.STATE_EXTENSION * self.state_length),
+                                                       initializer="uniform",
+                                                       name="node_3_input_kernel")
+        self.output_dnn_input_bias = self.add_weight(shape=(c.STATE_EXTENSION * self.state_length,),
+                                                     initializer="uniform",
+                                                     name="node_3_input_bias")
+
+        self.output_dnn_hidden_kernel_1 = self.add_weight(shape=(c.STATE_EXTENSION * self.state_length,
+                                                                 c.STATE_EXTENSION**2 * self.state_length),
+                                                          initializer="uniform",
+                                                          name="node_3_hidden_kernel_1")
+        self.output_dnn_hidden_bias_1 = self.add_weight(shape=(c.STATE_EXTENSION**2 * self.state_length,),
+                                                        initializer="uniform",
+                                                        name="node_3_hidden_bias_1")
+
+        self.output_dnn_hidden_kernel_2 = self.add_weight(shape=(c.STATE_EXTENSION**2 * self.state_length,
+                                                                 c.STATE_EXTENSION**3 * self.state_length),
+                                                          initializer="uniform",
+                                                          name="node_3_hidden_kernel_2")
+        self.output_dnn_hidden_bias_2 = self.add_weight(shape=(c.STATE_EXTENSION**3 * self.state_length,),
+                                                        initializer="uniform",
+                                                        name="node_3_hidden_bias_2")
+
+        self.output_dnn_hidden_kernel_3 = self.add_weight(shape=(c.STATE_EXTENSION**3 * self.state_length,
+                                                                 c.STATE_EXTENSION**2 * self.state_length),
+                                                          initializer="uniform",
+                                                          name="node_3_hidden_kernel_1")
+        self.output_dnn_hidden_bias_3 = self.add_weight(shape=(c.STATE_EXTENSION**2 * self.state_length,),
+                                                        initializer="uniform",
+                                                        name="node_3_hidden_bias_1")
+
+        self.output_dnn_hidden_kernel_4 = self.add_weight(shape=(c.STATE_EXTENSION**2 * self.state_length,
+                                                                 c.STATE_EXTENSION * self.state_length),
+                                                          initializer="uniform",
+                                                          name="node_3_hidden_kernel_2")
+        self.output_dnn_hidden_bias_4 = self.add_weight(shape=(c.STATE_EXTENSION * self.state_length,),
+                                                        initializer="uniform",
+                                                        name="node_3_hidden_bias_2")
+
+        self.output_dnn_output_kernel = self.add_weight(shape=(c.STATE_EXTENSION * self.state_length,
+                                                               self.number_of_output),
+                                                        initializer="uniform",
+                                                        name="node_3_output_kernel")
+        self.output_dnn_output_bias = self.add_weight(shape=(self.number_of_output,),
+                                                      initializer="uniform",
+                                                      name="node_3_output_bias")
+
+    def _call_output_dnn(self, inputs):
+        outputs = tf.matmul(inputs, self.output_dnn_input_kernel) + self.output_dnn_input_bias
+        outputs = tf.matmul(outputs, self.output_dnn_hidden_kernel_1) + self.output_dnn_hidden_bias_1
+        outputs = tf.tanh(tf.matmul(outputs, self.output_dnn_hidden_kernel_2) + self.output_dnn_hidden_bias_2)
+        outputs = tf.tanh(tf.matmul(outputs, self.output_dnn_hidden_kernel_3) + self.output_dnn_hidden_bias_3)
+        outputs = tf.matmul(outputs, self.output_dnn_hidden_kernel_4) + self.output_dnn_hidden_bias_4
+        outputs = tf.matmul(outputs, self.output_dnn_output_kernel) + self.output_dnn_output_bias
+        return outputs

@@ -3,7 +3,7 @@ import numpy as np
 
 class TeacherBenchMark:
     """
-    Prepare data from Wiener-Hammerstein Benchmark.
+    Prepare test_data from Wiener-Hammerstein Benchmark.
 
     J. Schoukens, J. Suykens, L. Ljung, "Wiener-Hammerstein Benchmark", 2009.
 
@@ -11,7 +11,7 @@ class TeacherBenchMark:
     https://tc.ifac-control.org/1/1/Data%20Repository/sysid-2009-wiener-hammerstein-benchmark
     """
     def __init__(self, neural_network_input_length):
-        data = np.genfromtxt('../data/BenchMark.csv', delimiter=',')
+        data = np.genfromtxt('test_data/BenchMark.csv', delimiter=',')
         data = data[4000:184000, :]
         self.number_of_samples = data.shape[0]
         self.input_sequence = np.reshape(data[:, 0], newshape=(self.number_of_samples, 1))
