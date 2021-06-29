@@ -3,7 +3,7 @@ import SystemDefinition.constants as c
 import matplotlib.pyplot as plt
 
 
-class LinearSystem:
+class LinearStateSpaceSystem:
     """ Definition of the linear dynamical discrete system"""
     def __init__(self, state_matrix: np.ndarray,
                  input_matrix: np.ndarray,
