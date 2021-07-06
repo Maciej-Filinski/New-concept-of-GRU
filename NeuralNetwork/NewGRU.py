@@ -6,7 +6,7 @@ class NewGRU(keras.layers.Layer):
     def __init__(self,
                  state_length: int,
                  number_of_outputs: int,
-                 input_dnn_structure: dict,
+                 candidate_dnn_structure: dict,
                  forget_dnn_structure: dict,
                  output_dnn_structure: dict,
                  forget_dnn_enable=True,
@@ -15,7 +15,7 @@ class NewGRU(keras.layers.Layer):
         self.state_length = state_length
         self.state_size = [tf.TensorShape(state_length)]
         self.number_of_outputs = number_of_outputs
-        self.candidate_dnn_structure = input_dnn_structure
+        self.candidate_dnn_structure = candidate_dnn_structure
         self.candidate_dnn = []
         self.forget_dnn_structure = forget_dnn_structure
         self.forget_dnn = []
@@ -46,7 +46,7 @@ class NewGRU(keras.layers.Layer):
             outputs = self._call_output_dnn(new_states)
         else:
             outputs = new_states
-        #tf.print(self.candidate_dnn)
+        #tf.print('inputs', inputs, 'states',  states, 'new state',  new_states)
         return outputs, new_states
 
     def _build_candidate_dnn(self, input_shape):

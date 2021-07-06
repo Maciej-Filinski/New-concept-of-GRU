@@ -1,7 +1,9 @@
 """
 Test: only candidate neural network.
 
-Learning test for linear state space system initial state = 0.
+Learning test for non-linear state space system initial state = 0.
+Eq 11. from D. Masti, A. Bemporad - Learning nonlinear state-space models using autoencoders.
+
 Neural network input => system input sequence.
 Neural network output => state space vector.
 """
@@ -24,17 +26,24 @@ test_inputs = np.sin(2 * np.pi * np.array(range(number_of_sample_test)) / 50)
 test_inputs = np.reshape(test_inputs, newshape=(number_of_sample_test, 1, NUMBER_OF_INPUTS))
 test_outputs = np.zeros(shape=(number_of_sample_test + 1, STATE_SPACE_VECTOR_LENGTH))
 
-state_matrix = np.array([[0.7, 0.8], [0, 0.1]])
-input_matrix = np.array([[-1], [0.1]])
+state_matrix = np.array([[0.7555, 0.25], [-0.1991, 0]])
+input_matrix = np.array([[-0.5], [0]])
 
 for i in range(1, number_of_sample_train + 1):
-    train_outputs[i, :] = state_matrix @ train_outputs[i - 1, :] + input_matrix @ train_inputs[i - 1, 0, :]
+    if train_inputs[i - 1, 0, :] > 0:
+        train_outputs[i, :] = state_matrix @ train_outputs[i - 1, :] + input_matrix @ np.sqrt(train_inputs[i - 1, 0, :])
+    else:
+        train_outputs[i, :] = state_matrix @ train_outputs[i - 1, :] + input_matrix @ train_inputs[i - 1, 0, :]
+
 train_outputs = train_outputs[1::, :]
 for i in range(1, number_of_sample_test + 1):
-    test_outputs[i, :] = state_matrix @ test_outputs[i - 1, :] + input_matrix @ test_inputs[i - 1, 0, :]
+    if test_inputs[i - 1, 0, :] > 0:
+        test_outputs[i, :] = state_matrix @ test_outputs[i - 1, :] + input_matrix @ np.sqrt(test_inputs[i - 1, 0, :])
+    else:
+        test_outputs[i, :] = state_matrix @ test_outputs[i - 1, :] + input_matrix @ test_inputs[i - 1, 0, :]
 test_outputs = test_outputs[1::, :]
 
-train_data_length = 1000
+train_data_length = 2000
 x_train = tf.ragged.constant([train_inputs[0:i, 0, :] for i in range(1, train_data_length + 1)])
 y_train = train_outputs[0:train_data_length, :]
 
@@ -47,9 +56,9 @@ model = build_model(ss_vector_length=STATE_SPACE_VECTOR_LENGTH,
                     number_of_inputs=NUMBER_OF_INPUTS,
                     batch_size=batch_size)
 model.summary()
-model.fit(x_train, y_train, epochs=10, batch_size=batch_size)
+model.fit(x_train, y_train, epochs=50, batch_size=batch_size)
 weights = model.get_weights()
-model.save_weights('./models/test_2/structure_1/')
+model.save_weights('./models/test_3/structure_1/')
 
 """
 Change batch size and prepare for plot result.
@@ -82,10 +91,10 @@ axs[0, 1].set_title('train: x_2')
 axs[0, 1].legend()
 axs[1, 0].plot(test_outputs[:, 0], 'b', label='true state', linewidth=4)
 axs[1, 0].plot(predicted_test_outputs[:, 0], '--r', label='predicted state', linewidth=2)
-axs[1, 0].set_title('test: x_1 - sin')
+axs[1, 0].set_title('test: x_1 - impulse response')
 axs[1, 0].legend()
 axs[1, 1].plot(test_outputs[:, 1], 'b', label='true state', linewidth=4)
 axs[1, 1].plot(predicted_test_outputs[:, 1], '--r', label='predicted state', linewidth=2)
-axs[1, 1].set_title('test: x_2 - sin')
+axs[1, 1].set_title('test: x_2 - impulse response')
 axs[1, 1].legend()
 plt.show()

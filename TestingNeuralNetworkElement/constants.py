@@ -1,6 +1,9 @@
 NEURAL_NETWORK_STATE_LENGTH = 2
 
-INPUT_DNN_STRUCTURE = {
+CANDIDATE_DNN_STRUCTURE = {
+    'IDNN_input_layer': 32,
+    'IDNN_hidden_layer_1': 64,
+    'IDNN_hidden_layer_5': 32,
     'IDNN_output_layer': NEURAL_NETWORK_STATE_LENGTH
 }
 

@@ -1,7 +1,7 @@
 """
 Test: only candidate neural network.
 
-Learning test for linear state space system initial state = 0.
+Learning test for linear state space system initial state =/= 0.
 Neural network input => system input sequence.
 Neural network output => state space vector.
 """
@@ -24,6 +24,8 @@ test_inputs = np.sin(2 * np.pi * np.array(range(number_of_sample_test)) / 50)
 test_inputs = np.reshape(test_inputs, newshape=(number_of_sample_test, 1, NUMBER_OF_INPUTS))
 test_outputs = np.zeros(shape=(number_of_sample_test + 1, STATE_SPACE_VECTOR_LENGTH))
 
+initial_state = np.array([1, 1])
+train_outputs[0, :] = initial_state
 state_matrix = np.array([[0.7, 0.8], [0, 0.1]])
 input_matrix = np.array([[-1], [0.1]])
 
@@ -47,9 +49,9 @@ model = build_model(ss_vector_length=STATE_SPACE_VECTOR_LENGTH,
                     number_of_inputs=NUMBER_OF_INPUTS,
                     batch_size=batch_size)
 model.summary()
-model.fit(x_train, y_train, epochs=10, batch_size=batch_size)
+model.fit(x_train, y_train, epochs=1, batch_size=batch_size)
 weights = model.get_weights()
-model.save_weights('./models/test_2/structure_1/')
+model.save_weights('./models/test_1/structure_1/')
 
 """
 Change batch size and prepare for plot result.
@@ -82,10 +84,10 @@ axs[0, 1].set_title('train: x_2')
 axs[0, 1].legend()
 axs[1, 0].plot(test_outputs[:, 0], 'b', label='true state', linewidth=4)
 axs[1, 0].plot(predicted_test_outputs[:, 0], '--r', label='predicted state', linewidth=2)
-axs[1, 0].set_title('test: x_1 - sin')
+axs[1, 0].set_title('test: x_1 - impulse response')
 axs[1, 0].legend()
 axs[1, 1].plot(test_outputs[:, 1], 'b', label='true state', linewidth=4)
 axs[1, 1].plot(predicted_test_outputs[:, 1], '--r', label='predicted state', linewidth=2)
-axs[1, 1].set_title('test: x_2 - sin')
+axs[1, 1].set_title('test: x_2 - impulse response')
 axs[1, 1].legend()
 plt.show()
