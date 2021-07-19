@@ -11,6 +11,7 @@ class NewGRU(keras.layers.Layer):
                  output_dnn_structure: dict,
                  forget_dnn_enable=True,
                  output_dnn_enable=True,
+                 full_output=False,
                  **kwargs):
         self.state_length = state_length
         self.state_size = [tf.TensorShape(state_length)]
@@ -23,6 +24,7 @@ class NewGRU(keras.layers.Layer):
         self.output_dnn = []
         self.forget_dnn_enable = forget_dnn_enable
         self.output_dnn_enable = output_dnn_enable
+        self.full_output = full_output
         super(NewGRU, self).__init__(**kwargs)
 
     def build(self, input_shape):
@@ -46,8 +48,10 @@ class NewGRU(keras.layers.Layer):
             outputs = self._call_output_dnn(new_states)
         else:
             outputs = new_states
-        #tf.print('inputs', inputs, 'states',  states, 'new state',  new_states)
-        return outputs, new_states
+        if self.full_output is True:
+            return (outputs, new_states, forget_dnn_outputs, candidate_dnn_outputs), new_states
+        else:
+            return outputs, new_states
 
     def _build_candidate_dnn(self, input_shape):
         input_shape = input_shape + self.state_length
@@ -65,7 +69,7 @@ class NewGRU(keras.layers.Layer):
         outputs = inputs
         layer_number = 1
         for kernel, bias in self.candidate_dnn:
-            if layer_number == len(self.candidate_dnn):
+            if layer_number == len(self.candidate_dnn) or layer_number == 1:
                 outputs = tf.matmul(outputs, kernel) + bias
             else:
                 outputs = tf.tanh(tf.matmul(outputs, kernel)) + bias
@@ -119,6 +123,12 @@ class NewGRU(keras.layers.Layer):
 
     def _call_output_dnn(self, inputs):
         outputs = inputs
+        layer_number = 1
         for kernel, bias in self.output_dnn:
-            outputs = tf.tanh(tf.matmul(outputs, kernel)) + bias
+            if layer_number == len(self.output_dnn_structure) or layer_number == 1:
+                outputs = tf.matmul(outputs, kernel) + bias
+            else:
+                outputs = tf.tanh(tf.matmul(outputs, kernel)) + bias
+
+            layer_number += 1
         return outputs

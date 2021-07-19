@@ -1,4 +1,4 @@
-NEURAL_NETWORK_STATE_LENGTH = 2
+NEURAL_NETWORK_STATE_LENGTH = 10
 
 CANDIDATE_DNN_STRUCTURE = {
     'IDNN_input_layer': 32,
@@ -22,5 +22,10 @@ FORGET_DNN_STRUCTURE = {
 
 OUTPUT_DNN_STRUCTURE = {
     'ODNN_input_layer': 32,
+    'ODNN_hidden_layer_1': 64,
+    'ODNN_hidden_layer_2': 128,
+    'ODNN_hidden_layer_3': 256,
+    'ODNN_hidden_layer_4': 128,
+    'ODNN_hidden_layer_5': 64,
     'ODNN_output_layer': None
 }
