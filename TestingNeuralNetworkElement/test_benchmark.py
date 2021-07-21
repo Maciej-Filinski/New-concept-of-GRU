@@ -46,7 +46,7 @@ def benchmark_data():
     # Extract training data
     u_train = np.zeros(n_multisine * n)
     y_train = np.zeros(n_multisine * n)
-    for i, r in enumerate(n_multisine):
+    for i, r in enumerate(range(n_multisine)):
         u_train[i * n + np.arange(n)] = u[n_zeros + n_test + r * n_block + n_trans_before + np.arange(n)]
         y_train[i * n + np.arange(n)] = y[n_zeros + n_test + r * n_block + n_trans_before + np.arange(n)]
     
