@@ -1,0 +1,24 @@
+{
+    "state_length": 5,
+    "candidate_dnn": {
+        "IDNN_input_layer": 32,
+        "IDNN_hidden_layer_1": 64,
+        "IDNN_hidden_layer_2": 32,
+        "IDNN_output_layer": 5
+    },
+    "forget_dnn": {
+        "FDNN_input_layer": 32,
+        "FDNN_hidden_layer_1": 64,
+        "FDNN_hidden_layer_2": 32,
+        "FDNN_output_layer": 5
+    },
+    "output_dnn": {
+        "ODNN_input_layer": 32,
+        "ODNN_hidden_layer_1": 64,
+        "ODNN_hidden_layer_2": 32,
+        "ODNN_output_layer": null
+    },
+    "forget_dnn_enable": true,
+    "output_dnn_enable": true,
+    "return_full_output": true
+}
