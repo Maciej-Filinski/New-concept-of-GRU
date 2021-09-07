@@ -25,6 +25,6 @@
         "return_full_output": true
     },
     "batch size": null,
-    "number of train sample": 100,
+    "number of train sample": 2000,
     "trained model path": "C:\\Users\\macie\\Desktop\\Programowanie\\Python\\NewConceptOfGRU\\simulation\\trained_model\\toy_problem_sim_1.hdf5"
 }

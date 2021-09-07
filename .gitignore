@@ -4,3 +4,5 @@ __pycache__/*
 *.pyc
 DataPreprocessing/test_data
 TestingNeuralNetworkElement/Result/*
+simulation/result/*
+simulation/trained_model/*

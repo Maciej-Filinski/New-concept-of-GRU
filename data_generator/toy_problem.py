@@ -1,24 +1,24 @@
 from .data_generator import DataGenerator
-from system_definition import ToyProblemSystem
+from system_definition import ToyProblemSystem, ToyProblemSystemV2, ToyProblemSystemV3
 import numpy as np
 
 
 class ToyProblem(DataGenerator):
     number_of_inputs = 1
-    state_length = 2
     number_of_outputs = 1
     scale = 4
 
     def __init__(self,
                  number_of_train_samples: int,
                  number_of_test_samples: int,
+                 dataset_name: str,
                  random_seed=False):
         self.system = ToyProblemSystem()
         self.random_seed = random_seed
         if random_seed is True:
             super().__init__('toy_problem_random_seed', number_of_train_samples, number_of_test_samples, create=True)
         else:
-            super().__init__('toy_problem', number_of_train_samples, number_of_test_samples, create=False)
+            super().__init__(dataset_name, number_of_train_samples, number_of_test_samples, create=False)
 
     def _create_data(self):
         print('Create data...')
@@ -30,3 +30,23 @@ class ToyProblem(DataGenerator):
                             newshape=(self.number_of_test_samples, 1))
         self.data['test'] = self.system.response(inputs=inputs)
         self._save_data()
+
+
+class ToyProblemV2(ToyProblem):
+    def __init__(self,
+                 number_of_train_samples: int,
+                 number_of_test_samples: int,
+                 dataset_name: str,
+                 random_seed=False):
+        super().__init__(number_of_train_samples, number_of_test_samples, dataset_name,  random_seed=random_seed)
+        self.system = ToyProblemSystemV2()
+
+
+class ToyProblemV3(ToyProblem):
+    def __init__(self,
+                 number_of_train_samples: int,
+                 number_of_test_samples: int,
+                 dataset_name: str,
+                 random_seed=False):
+        super().__init__(number_of_train_samples, number_of_test_samples, dataset_name,  random_seed=random_seed)
+        self.system = ToyProblemSystemV2()

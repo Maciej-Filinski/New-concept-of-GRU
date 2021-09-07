@@ -25,8 +25,7 @@ class DataGenerator:
     def load_data(self):
         if self.create is True:
             self._create_data()
-            return self.data
-        if os.path.exists(self.data_path_load) is True:
+        elif os.path.exists(self.data_path_load) is True:
             print('File exist.')
             if os.path.getsize(self.data_path_load) != 0:
                 print('Loading...')
