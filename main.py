@@ -7,7 +7,7 @@ MAX_TASK = os.cpu_count() // 2
 SIMULATION_REPEAT = 2
 SIMULATION_LIST = [dict(data_generator=ToyProblem, number_of_train_samples=1000,
                         dataset_name='toy_problem_v1', new_layer=NewGRU2,
-                        structure_file_name='structure_1.json',
+                        structure_file_name='structure_2.json',
                         number_of_epochs=20, batch_size=100, shuffle=True) for _ in range(SIMULATION_REPEAT)] + \
                   [dict(data_generator=ToyProblemV2, number_of_train_samples=1000,
                         dataset_name='toy_problem_v2', new_layer=NewGRU2,

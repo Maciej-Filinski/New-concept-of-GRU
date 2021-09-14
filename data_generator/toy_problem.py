@@ -6,7 +6,7 @@ import numpy as np
 class ToyProblem(DataGenerator):
     number_of_inputs = 1
     number_of_outputs = 1
-    scale = 4
+    scale = 1
 
     def __init__(self,
                  number_of_train_samples: int,
@@ -49,4 +49,5 @@ class ToyProblemV3(ToyProblem):
                  dataset_name: str,
                  random_seed=False):
         super().__init__(number_of_train_samples, number_of_test_samples, dataset_name,  random_seed=random_seed)
-        self.system = ToyProblemSystemV2()
+        self.system = ToyProblemSystemV3()
+

@@ -3,7 +3,7 @@ from tensorflow import keras
 import tensorflow as tf
 
 
-class NewGRU(keras.layers.Layer):
+class NewGRULinear(keras.layers.Layer):
     def __init__(self,
                  state_length: int,
                  number_of_outputs: int,
@@ -26,7 +26,7 @@ class NewGRU(keras.layers.Layer):
         self.forget_dnn_enable = forget_dnn_enable
         self.output_dnn_enable = output_dnn_enable
         self.return_full_output = return_full_output
-        super(NewGRU, self).__init__(**kwargs)
+        super(NewGRULinear, self).__init__(**kwargs)
 
     def build(self, input_shape):
         input_shape = input_shape[1]
@@ -75,7 +75,7 @@ class NewGRU(keras.layers.Layer):
             if layer_number == len(self.candidate_dnn) or layer_number == 1:
                 outputs = tf.matmul(outputs, kernel) + bias
             else:
-                outputs = tf.tanh(tf.matmul(outputs, kernel)) + bias
+                outputs = tf.matmul(outputs, kernel) + bias
             layer_number += 1
         return outputs
 
@@ -96,9 +96,9 @@ class NewGRU(keras.layers.Layer):
         layer_number = 1
         for kernel, bias in self.forget_dnn:
             if layer_number == len(self.forget_dnn):
-                outputs = tf.sigmoid(tf.matmul(outputs, kernel)) + bias
+                outputs = tf.matmul(outputs, kernel) + bias
             else:
-                outputs = tf.tanh(tf.matmul(outputs, kernel)) + bias
+                outputs = tf.matmul(outputs, kernel) + bias
             layer_number += 1
         return outputs
 
@@ -131,6 +131,6 @@ class NewGRU(keras.layers.Layer):
             if layer_number == len(self.output_dnn_structure) or layer_number == 1:
                 outputs = tf.matmul(outputs, kernel) + bias
             else:
-                outputs = tf.tanh(tf.matmul(outputs, kernel)) + bias
+                outputs = tf.matmul(outputs, kernel) + bias
             layer_number += 1
         return outputs

@@ -1,0 +1,15 @@
+{
+    "state_length": 2,
+    "candidate_dnn": {
+        "IDNN_output_layer": 2
+    },
+    "forget_dnn": {
+        "FDNN_output_layer": 2
+    },
+    "output_dnn": {
+        "ODNN_output_layer": null
+    },
+    "forget_dnn_enable": false,
+    "output_dnn_enable": true,
+    "return_full_output": false
+}
