@@ -1,34 +1,51 @@
-from neural_network import NewGRU, NewGRU2
+from neural_network import NewGRU, NewGRU2, NewGRULinear
 from data_generator import ToyProblem, SimpleSilverbox, ToyProblemV2, ToyProblemV3
 from simulation import Simulation
 from multiprocessing import Process
 import os
+"""
+step:
+0.4 s -> 100
+2 s -> 500
+"""
 MAX_TASK = os.cpu_count() // 2
-SIMULATION_REPEAT = 2
-SIMULATION_LIST = [dict(data_generator=ToyProblem, number_of_train_samples=1000,
-                        dataset_name='toy_problem_v1', new_layer=NewGRU2,
+SIMULATION_REPEAT = 150
+SIMULATION_LIST = [dict(data_generator=ToyProblem, number_of_train_samples=500,
+                        dataset_name='toy_problem_v1', new_layer=NewGRULinear,
                         structure_file_name='structure_2.json',
-                        number_of_epochs=20, batch_size=100, shuffle=True) for _ in range(SIMULATION_REPEAT)] + \
-                  [dict(data_generator=ToyProblemV2, number_of_train_samples=1000,
-                        dataset_name='toy_problem_v2', new_layer=NewGRU2,
-                        structure_file_name='structure_1.json',
-                        number_of_epochs=20, batch_size=100, shuffle=True) for _ in range(SIMULATION_REPEAT)] + \
-                  [dict(data_generator=ToyProblemV3, number_of_train_samples=1000,
-                        dataset_name='toy_problem_v3', new_layer=NewGRU2,
-                        structure_file_name='structure_1.json',
-                        number_of_epochs=20, batch_size=100, shuffle=True) for _ in range(SIMULATION_REPEAT)] + \
-                  [dict(data_generator=ToyProblem, number_of_train_samples=1000,
-                        dataset_name='toy_problem_v1', new_layer=NewGRU,
-                        structure_file_name='structure_1.json',
-                        number_of_epochs=20, batch_size=100, shuffle=True) for _ in range(SIMULATION_REPEAT)] + \
-                  [dict(data_generator=ToyProblemV2, number_of_train_samples=1000,
-                        dataset_name='toy_problem_v2', new_layer=NewGRU,
-                        structure_file_name='structure_1.json',
-                        number_of_epochs=20, batch_size=100, shuffle=True) for _ in range(SIMULATION_REPEAT)] + \
-                  [dict(data_generator=ToyProblemV3, number_of_train_samples=1000,
-                        dataset_name='toy_problem_v3', new_layer=NewGRU,
-                        structure_file_name='structure_1.json',
-                        number_of_epochs=20, batch_size=100, shuffle=True) for _ in range(SIMULATION_REPEAT)]
+                        number_of_epochs=500, batch_size=500, shuffle=True) for _ in range(SIMULATION_REPEAT)] + \
+                  [dict(data_generator=ToyProblemV2, number_of_train_samples=500,
+                        dataset_name='toy_problem_v2', new_layer=NewGRULinear,
+                        structure_file_name='structure_2.json',
+                        number_of_epochs=500, batch_size=500, shuffle=True) for _ in range(SIMULATION_REPEAT)] + \
+                  [dict(data_generator=ToyProblemV3, number_of_train_samples=500,
+                        dataset_name='toy_problem_v3', new_layer=NewGRULinear,
+                        structure_file_name='structure_2.json',
+                        number_of_epochs=500, batch_size=500, shuffle=True) for _ in range(SIMULATION_REPEAT)] + \
+                  [dict(data_generator=ToyProblem, number_of_train_samples=500,
+                        dataset_name='toy_problem_v1', new_layer=NewGRULinear,
+                        structure_file_name='structure_2.json',
+                        number_of_epochs=500, batch_size=50, shuffle=True) for _ in range(SIMULATION_REPEAT)] + \
+                  [dict(data_generator=ToyProblemV2, number_of_train_samples=500,
+                        dataset_name='toy_problem_v2', new_layer=NewGRULinear,
+                        structure_file_name='structure_2.json',
+                        number_of_epochs=500, batch_size=50, shuffle=True) for _ in range(SIMULATION_REPEAT)] + \
+                  [dict(data_generator=ToyProblemV3, number_of_train_samples=500,
+                        dataset_name='toy_problem_v3', new_layer=NewGRULinear,
+                        structure_file_name='structure_2.json',
+                        number_of_epochs=500, batch_size=50, shuffle=True) for _ in range(SIMULATION_REPEAT)] + \
+                  [dict(data_generator=ToyProblem, number_of_train_samples=500,
+                        dataset_name='toy_problem_v1', new_layer=NewGRULinear,
+                        structure_file_name='structure_2.json',
+                        number_of_epochs=500, batch_size=100, shuffle=True) for _ in range(SIMULATION_REPEAT)] + \
+                  [dict(data_generator=ToyProblemV2, number_of_train_samples=500,
+                        dataset_name='toy_problem_v2', new_layer=NewGRULinear,
+                        structure_file_name='structure_2.json',
+                        number_of_epochs=500, batch_size=100, shuffle=True) for _ in range(SIMULATION_REPEAT)] + \
+                  [dict(data_generator=ToyProblemV3, number_of_train_samples=500,
+                        dataset_name='toy_problem_v3', new_layer=NewGRULinear,
+                        structure_file_name='structure_2.json',
+                        number_of_epochs=500, batch_size=100, shuffle=True) for _ in range(SIMULATION_REPEAT)]
 
 
 # TODO: Implement metric from article: Learning nonlinear state–space models using autoencoders
@@ -63,7 +80,7 @@ if __name__ == '__main__':
                 process.join(timeout=0)
                 if not process.is_alive():
                     processes.remove(process)
-        p = Process(target=sim, args=(index + 34, sim_parameters))
+        p = Process(target=sim, args=(index, sim_parameters))
         p.start()
         processes.append(p)
 

@@ -51,7 +51,10 @@ class NewGRU2(keras.layers.Layer):
         else:
             outputs = new_states
         if self.return_full_output:
-            return (outputs, new_states, forget_dnn_outputs, candidate_dnn_outputs), new_states
+            if self.forget_dnn_enable is True:
+                return (outputs, new_states, forget_dnn_outputs, candidate_dnn_outputs), new_states
+            else:
+                return (outputs, new_states, candidate_dnn_outputs), new_states
         else:
             return outputs, new_states
 

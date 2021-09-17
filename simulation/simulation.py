@@ -19,11 +19,10 @@ class Simulation:
         if os.path.exists(self.structure_file_name) is False:
             raise FileNotFoundError('File not exist.')
         with open(self.structure_file_name, 'r') as file:
-            structure = json.load(file)
-        self.state_length = structure['state_length']
-        self.model = self._build_model(structure)
+            self.structure = json.load(file)
+        self.model = self._build_model(self.structure)
         self.result = Result(problem_name=self.data_generator.__name__,
-                             structure=structure,
+                             structure=self.structure,
                              number_of_train_sample=self.data_generator.number_of_train_samples,
                              simulation_number=simulation_number)
 
@@ -49,16 +48,20 @@ class Simulation:
                 loss_function[epoch, step] = loss
                 print(f'epoch:{epoch + 1:3}/{number_of_epochs:3}, step:{step + 1:3}/{number_of_batch:3},',
                       f'step execution time:{execution_time[epoch, step]:.2f}s,',
-                      f'loss:{loss:.5f}')
+                      f'loss:{loss:.8f}')
 
         train_info = {'loss_function': loss_function,
                       'execution_time': execution_time}
+        self.model.save_weights(self.result.model_path)
+        weights = self.model.get_weights()
+        self.structure['return_full_output'] = True
+        self.model = self._build_model(self.structure)
+        self.model.set_weights(weights)
         test_info = self._test(train_inputs=data['train']['inputs'][:self.data_generator.number_of_test_samples, :, :],
                                train_outputs=data['train']['outputs'][:self.data_generator.number_of_test_samples, :],
                                test_inputs=data['test']['inputs'],
                                test_outputs=data['test']['outputs'])
         self.result.data = {**train_info, **test_info}
-        self.model.save_weights(self.result.model_path)
         self.result.save()
 
     def _run_one_step(self, x_train: np.ndarray, y_train: np.ndarray, batch_shuffle_set: list):
@@ -68,9 +71,14 @@ class Simulation:
         self.model.reset_states()
         y_predicted = []
         with tf.GradientTape() as tape:
-            for i in range(max_value + 1):
-                y, *rest = self.model(x_train[i, :, :])
-                y_predicted.append(y)
+            if self.structure['return_full_output'] is True:
+                for i in range(max_value + 1):
+                    y, *rest = self.model(x_train[i, :, :])
+                    y_predicted.append(y)
+            else:
+                for i in range(max_value + 1):
+                    y = self.model(x_train[i, :, :])
+                    y_predicted.append(y)
             y_predicted = tf.convert_to_tensor(y_predicted)
             y_1 = []
             y_2 = []
@@ -105,11 +113,14 @@ class Simulation:
     def _test(self, train_inputs, train_outputs, test_inputs, test_outputs):
         self.model.reset_states()
         outputs = np.zeros(shape=(self.data_generator.number_of_test_samples, self.data_generator.number_of_outputs))
-        state = np.zeros(shape=(self.data_generator.number_of_test_samples, self.state_length))
-        forget = np.zeros(shape=(self.data_generator.number_of_test_samples, self.state_length))
-        candidate = np.zeros(shape=(self.data_generator.number_of_test_samples, self.state_length))
+        state = np.zeros(shape=(self.data_generator.number_of_test_samples, self.structure['state_length']))
+        forget = np.zeros(shape=(self.data_generator.number_of_test_samples, self.structure['state_length']))
+        candidate = np.zeros(shape=(self.data_generator.number_of_test_samples, self.structure['state_length']))
         for i in range(self.data_generator.number_of_test_samples):
-            outputs[i, :], state[i, :], forget[i, :], candidate[i, :] = self.model(train_inputs[i, :, :])
+            if self.structure['forget_dnn_enable'] is True:
+                outputs[i, :], state[i, :], forget[i, :], candidate[i, :] = self.model(train_inputs[i, :, :])
+            else:
+                outputs[i, :], state[i, :], candidate[i, :] = self.model(train_inputs[i, :, :])
         result_train = {'train_inputs': train_inputs,
                         'train_outputs': train_outputs,
                         'train_predicted_outputs': outputs,
@@ -118,11 +129,14 @@ class Simulation:
                         'train_candidate': candidate}
         self.model.reset_states()
         outputs = np.zeros(shape=(self.data_generator.number_of_test_samples, self.data_generator.number_of_outputs))
-        state = np.zeros(shape=(self.data_generator.number_of_test_samples, self.state_length))
-        forget = np.zeros(shape=(self.data_generator.number_of_test_samples, self.state_length))
-        candidate = np.zeros(shape=(self.data_generator.number_of_test_samples, self.state_length))
+        state = np.zeros(shape=(self.data_generator.number_of_test_samples, self.structure['state_length']))
+        forget = np.zeros(shape=(self.data_generator.number_of_test_samples, self.structure['state_length']))
+        candidate = np.zeros(shape=(self.data_generator.number_of_test_samples, self.structure['state_length']))
         for i in range(self.data_generator.number_of_test_samples):
-            outputs[i, :], state[i, :], forget[i, :], candidate[i, :] = self.model(test_inputs[i, :, :])
+            if self.structure['forget_dnn_enable'] is True:
+                outputs[i, :], state[i, :], forget[i, :], candidate[i, :] = self.model(test_inputs[i, :, :])
+            else:
+                outputs[i, :], state[i, :], candidate[i, :] = self.model(test_inputs[i, :, :])
         result_test = {'test_inputs': test_inputs,
                        'test_outputs': test_outputs,
                        'test_predicted_outputs': outputs,
