@@ -14,9 +14,9 @@ class DataGenerator:
                  number_of_test_samples: int,
                  create: bool = False):
         self.__name__ = data_file_name
-        self.data_path_load = os.path.join(os.path.abspath('../NewConceptOfGRU/simulation/datasets'),
+        self.data_path_load = os.path.join(os.path.abspath('../New-concept-of-GRU/simulation/datasets'),
                                            data_file_name + '.npz')
-        self.data_path_save = os.path.join(os.path.abspath('../NewConceptOfGRU/simulation/datasets'), data_file_name)
+        self.data_path_save = os.path.join(os.path.abspath('../New-concept-of-GRU/simulation/datasets'), data_file_name)
         self.number_of_test_samples = number_of_test_samples
         self.number_of_train_samples = number_of_train_samples
         self.create = create

@@ -3,8 +3,8 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 
-RESULT_DIR = os.path.abspath('../NewConceptOfGRU/simulation/result')
-MODEL_DIR = os.path.abspath('../NewConceptOfGRU/simulation/trained_model')
+RESULT_DIR = os.path.abspath('../New-concept-of-GRU/simulation/result')
+MODEL_DIR = os.path.abspath('../New-concept-of-GRU/simulation/trained_model')
 
 
 class Result:
@@ -36,7 +36,7 @@ class Result:
         self.model_path = path + '.hdf5'
         with open(self.result_path) as file:
             data = json.load(file)
-        self.problem_name = data['problem name']
+        # self.problem_name = data['problem name']
         self.structure = data['structure']
         self.batch_size = data['batch size']
         self.number_of_train_sample = data['number of train sample']
@@ -80,14 +80,14 @@ class Result:
             axs[0, 0].plot(self.data['train_predicted_outputs'], '--r', label='predicted output', linewidth=2)
             axs[0, 0].set_title('TRAIN')
             # axs[0, 0].legend()
-            axs[0, 0].set_ylim([-1, 1])
+            # axs[0, 0].set_ylim([-5, 5])
             axs[0, 0].grid()
             axs[0, 0].set_ylabel(r'$\hat{y}_n$')
 
             axs[0, 1].plot(self.data['test_outputs'], 'g', label='true output', linewidth=2)
             axs[0, 1].plot(self.data['test_predicted_outputs'], '--r', label='predicted output', linewidth=2)
             axs[0, 1].set_title('TEST')
-            axs[0, 1].set_ylim([-1, 1])
+            # axs[0, 1].set_ylim([-5, 5])
             axs[0, 1].grid()
             # axs[0, 1].legend()
 
@@ -111,7 +111,9 @@ class Result:
             axs[3, 0].set_xlabel(r'$n$')
             axs[3, 1].set_xlabel(r'$n$')
             axs[3, 1].set_ylim([0, 1])
-
+            fig_manager = plt.get_current_fig_manager()
+            fig_manager.window.showMaximized()
+            fig_manager.set_window_title(self.problem_name)
             plt.show()
         else:
             print('Result no available.')
