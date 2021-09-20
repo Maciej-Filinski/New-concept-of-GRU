@@ -1,13 +1,9 @@
 from neural_network import NewGRU, NewGRU2, NewGRULinear
 from data_generator import ToyProblem, SimpleSilverbox, ToyProblemV2, ToyProblemV3
-from simulation import Simulation
+from simulation import SimulationNewGRU
 from multiprocessing import Process
 import os
-"""
-step:
-0.4 s -> 100
-2 s -> 500
-"""
+
 MAX_TASK = os.cpu_count()
 SIMULATION_REPEAT = 250
 SIMULATION_LIST = [dict(data_generator=ToyProblem, number_of_train_samples=500,
@@ -65,9 +61,9 @@ def sim(simulation_number, kwargs):
                                          number_of_test_samples=100, dataset_name=kwargs['dataset_name'],
                                          train_phase=simulation_number % 10, test_phase=(simulation_number + 1) % 10)
 
-    simulation = Simulation(data_generator=data_generator, new_layer=kwargs['new_layer'],
-                            structure_file_name=kwargs['structure_file_name'],
-                            simulation_number=simulation_number)
+    simulation = SimulationNewGRU(data_generator=data_generator, new_layer=kwargs['new_layer'],
+                                  structure_file_name=kwargs['structure_file_name'],
+                                  simulation_number=simulation_number)
     simulation.run(number_of_epochs=kwargs['number_of_epochs'], batch_size=kwargs['batch_size'],
                    shuffle=kwargs['shuffle'])
 

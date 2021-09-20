@@ -9,7 +9,7 @@ import numpy as np
 import datetime
 
 
-class Simulation:
+class SimulationNewGRU:
     def __init__(self, data_generator: DataGenerator, new_layer, structure_file_name: str, simulation_number: int = 1):
         self.data_generator = data_generator
         self.structure_file_name = os.path.join(os.path.abspath('../New-concept-of-GRU/simulation/neural_network_structure'),
