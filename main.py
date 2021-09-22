@@ -1,44 +1,44 @@
-from neural_network import NewGRU, NewGRU2, NewGRULinear
-from data_generator import ToyProblem, SimpleSilverbox, ToyProblemV2, ToyProblemV3
+from layers import NewGRU, NewGRU2, NewGRULinear
+from data_generator import ToyProblemOriginal, SimpleSilverbox, ToyProblemComplexRoots, ToyProblemRealRoots
 from simulation import SimulationNewGRU
 from multiprocessing import Process
 import os
 
 MAX_TASK = os.cpu_count()
 SIMULATION_REPEAT = 250
-SIMULATION_LIST = [dict(data_generator=ToyProblem, number_of_train_samples=500,
+SIMULATION_LIST = [dict(data_generator=ToyProblemOriginal, number_of_train_samples=500,
                         dataset_name='toy_problem_v1', new_layer=NewGRULinear,
                         structure_file_name='structure_2.json',
                         number_of_epochs=500, batch_size=500, shuffle=True) for _ in range(SIMULATION_REPEAT)] + \
-                  [dict(data_generator=ToyProblemV2, number_of_train_samples=500,
+                  [dict(data_generator=ToyProblemComplexRoots, number_of_train_samples=500,
                         dataset_name='toy_problem_v2', new_layer=NewGRULinear,
                         structure_file_name='structure_2.json',
                         number_of_epochs=500, batch_size=500, shuffle=True) for _ in range(SIMULATION_REPEAT)] + \
-                  [dict(data_generator=ToyProblemV3, number_of_train_samples=500,
+                  [dict(data_generator=ToyProblemRealRoots, number_of_train_samples=500,
                         dataset_name='toy_problem_v3', new_layer=NewGRULinear,
                         structure_file_name='structure_2.json',
                         number_of_epochs=500, batch_size=500, shuffle=True) for _ in range(SIMULATION_REPEAT)] + \
-                  [dict(data_generator=ToyProblem, number_of_train_samples=500,
+                  [dict(data_generator=ToyProblemOriginal, number_of_train_samples=500,
                         dataset_name='toy_problem_v1', new_layer=NewGRULinear,
                         structure_file_name='structure_2.json',
                         number_of_epochs=500, batch_size=50, shuffle=True) for _ in range(SIMULATION_REPEAT)] + \
-                  [dict(data_generator=ToyProblemV2, number_of_train_samples=500,
+                  [dict(data_generator=ToyProblemComplexRoots, number_of_train_samples=500,
                         dataset_name='toy_problem_v2', new_layer=NewGRULinear,
                         structure_file_name='structure_2.json',
                         number_of_epochs=500, batch_size=50, shuffle=True) for _ in range(SIMULATION_REPEAT)] + \
-                  [dict(data_generator=ToyProblemV3, number_of_train_samples=500,
+                  [dict(data_generator=ToyProblemRealRoots, number_of_train_samples=500,
                         dataset_name='toy_problem_v3', new_layer=NewGRULinear,
                         structure_file_name='structure_2.json',
                         number_of_epochs=500, batch_size=50, shuffle=True) for _ in range(SIMULATION_REPEAT)] + \
-                  [dict(data_generator=ToyProblem, number_of_train_samples=500,
+                  [dict(data_generator=ToyProblemOriginal, number_of_train_samples=500,
                         dataset_name='toy_problem_v1', new_layer=NewGRULinear,
                         structure_file_name='structure_2.json',
                         number_of_epochs=500, batch_size=100, shuffle=True) for _ in range(SIMULATION_REPEAT)] + \
-                  [dict(data_generator=ToyProblemV2, number_of_train_samples=500,
+                  [dict(data_generator=ToyProblemComplexRoots, number_of_train_samples=500,
                         dataset_name='toy_problem_v2', new_layer=NewGRULinear,
                         structure_file_name='structure_2.json',
                         number_of_epochs=500, batch_size=100, shuffle=True) for _ in range(SIMULATION_REPEAT)] + \
-                  [dict(data_generator=ToyProblemV3, number_of_train_samples=500,
+                  [dict(data_generator=ToyProblemRealRoots, number_of_train_samples=500,
                         dataset_name='toy_problem_v3', new_layer=NewGRULinear,
                         structure_file_name='structure_2.json',
                         number_of_epochs=500, batch_size=100, shuffle=True) for _ in range(SIMULATION_REPEAT)]
@@ -46,16 +46,16 @@ SIMULATION_LIST = [dict(data_generator=ToyProblem, number_of_train_samples=500,
 
 # TODO: Implement metric from article: Learning nonlinear state–space models using autoencoders
 def sim(simulation_number, kwargs):
-    if kwargs['data_generator'] == ToyProblem:
-        data_generator = ToyProblem(number_of_train_samples=kwargs['number_of_train_samples'],
-                                    number_of_test_samples=100, dataset_name=kwargs['dataset_name'], random_seed=False)
-    elif kwargs['data_generator'] == ToyProblemV2:
-        data_generator = ToyProblemV2(number_of_train_samples=kwargs['number_of_train_samples'],
-                                      number_of_test_samples=100, dataset_name=kwargs['dataset_name'],
-                                      random_seed=False)
-    elif kwargs['data_generator'] == ToyProblemV3:
-        data_generator = ToyProblemV3(number_of_train_samples=kwargs['number_of_train_samples'],
-                                      number_of_test_samples=100, dataset_name=kwargs['dataset_name'], random_seed=False)
+    if kwargs['data_generator'] == ToyProblemOriginal:
+        data_generator = ToyProblemOriginal(number_of_train_samples=kwargs['number_of_train_samples'],
+                                            number_of_test_samples=100, dataset_name=kwargs['dataset_name'], random_seed=False)
+    elif kwargs['data_generator'] == ToyProblemComplexRoots:
+        data_generator = ToyProblemComplexRoots(number_of_train_samples=kwargs['number_of_train_samples'],
+                                                number_of_test_samples=100, dataset_name=kwargs['dataset_name'],
+                                                random_seed=False)
+    elif kwargs['data_generator'] == ToyProblemRealRoots:
+        data_generator = ToyProblemRealRoots(number_of_train_samples=kwargs['number_of_train_samples'],
+                                             number_of_test_samples=100, dataset_name=kwargs['dataset_name'], random_seed=False)
     elif kwargs['data_generator'] == SimpleSilverbox:
         data_generator = SimpleSilverbox(number_of_train_samples=kwargs['number_of_train_samples'],
                                          number_of_test_samples=100, dataset_name=kwargs['dataset_name'],

@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class ToyProblemSystem:
+class ToyProblemSystemOriginal:
     state_matrix = np.array([[0.7555, 0.25], [-0.1991, 0]])
     input_matrix = np.array([[-0.5], [0]])
     output_matrix = np.array([0.6993, -0.4427])
@@ -31,7 +31,7 @@ class ToyProblemSystem:
         return {'inputs': inputs, 'outputs': outputs, 'states': states}
 
 
-class ToyProblemSystemV2(ToyProblemSystem):
+class ToyProblemSystemComplexRoots(ToyProblemSystemOriginal):
     state_matrix = np.array([[1.3652, -0.8259], [1, 0]])
     input_matrix = np.array([[1], [0]])
     output_matrix = np.array([-0.3497, -0.0441])
@@ -54,7 +54,7 @@ class ToyProblemSystemV2(ToyProblemSystem):
         return {'inputs': inputs, 'outputs': outputs, 'states': states}
 
 
-class ToyProblemSystemV3(ToyProblemSystem):
+class ToyProblemSystemRealRoots(ToyProblemSystemOriginal):
     state_matrix = np.array([[1.3652, -0.4659], [1, 0]])
     input_matrix = np.array([[1], [0]])
     output_matrix = np.array([-0.3497, -0.0441])

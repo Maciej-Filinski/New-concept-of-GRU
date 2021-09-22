@@ -1,14 +1,14 @@
 import numpy as np
 
-from neural_network import NewGRULinear
+from layers import NewGRULinear
 import tensorflow as tf
 from tensorflow import keras
 import os
 import json
-from data_generator import ToyProblem, ToyProblemV2, ToyProblemV3
+from data_generator import ToyProblemOriginal, ToyProblemComplexRoots, ToyProblemRealRoots
 import matplotlib.pyplot as plt
 
-generator = ToyProblemV3(number_of_train_samples=100, number_of_test_samples=100, dataset_name='toy_problem_v3')
+generator = ToyProblemRealRoots(number_of_train_samples=100, number_of_test_samples=100, dataset_name='toy_problem_v3')
 data = generator.load_data()
 structure_path = os.path.join(os.path.abspath('simulation/neural_network_structure'),
                               'structure_2.json')

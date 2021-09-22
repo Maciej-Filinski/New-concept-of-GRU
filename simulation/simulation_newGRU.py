@@ -107,7 +107,6 @@ class SimulationNewGRU:
         model = keras.models.Model(input_layer, output)
         model.compile(optimizer='adam', loss=tf.keras.losses.MeanSquaredError(),
                       metrics=[tf.keras.metrics.RootMeanSquaredError()])
-        model.summary()
         return model
 
     def _test(self, train_inputs, train_outputs, test_inputs, test_outputs):
