@@ -1,2 +1,2 @@
 from .result import Result
-from .simulation_newGRU import SimulationNewGRU
+from .simulation import Simulation

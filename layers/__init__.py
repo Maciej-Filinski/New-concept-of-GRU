@@ -1,4 +1,2 @@
-from .new_gru import NewGRU
-from .new_gru_v2 import NewGRU2
-from .new_gru_linear import NewGRULinear
+from .new_gru import NewGRU, NewGRULinear
 from .basic_LSTM import BasicLSTM

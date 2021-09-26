@@ -2,7 +2,7 @@ import numpy as np
 import os
 import json
 import matplotlib.pyplot as plt
-from layers import NewGRU, NewGRU2, NewGRULinear
+from layers import NewGRU, NewGRULinear
 from models import NeuralNetworkNewGRU
 from data_generator import ToyProblemOriginal, ToyProblemComplexRoots, ToyProblemRealRoots
 

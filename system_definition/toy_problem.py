@@ -18,7 +18,7 @@ class ToyProblemSystemOriginal:
         """
         number_of_samples = inputs.shape[0]
         states = np.zeros(shape=(number_of_samples + 1, 2))
-        outputs = np.zeros(shape=(number_of_samples + 1, 1))
+        outputs = np.zeros(shape=(number_of_samples, 1))
         for i in range(1, number_of_samples + 1):
             if inputs[i - 1, :] > 0:
                 states[i, :] = self.state_matrix @ states[i - 1, :] + self.input_matrix @ np.sqrt(inputs[i - 1, :])
@@ -44,7 +44,7 @@ class ToyProblemSystemComplexRoots(ToyProblemSystemOriginal):
         """
         number_of_samples = inputs.shape[0]
         states = np.zeros(shape=(number_of_samples + 1, 2))
-        outputs = np.zeros(shape=(number_of_samples + 1, 1))
+        outputs = np.zeros(shape=(number_of_samples, 1))
         for i in range(1, number_of_samples + 1):
             states[i, :] = self.state_matrix @ states[i - 1, :] + self.input_matrix @ inputs[i - 1, :]
         states = states[1::, :]
@@ -67,7 +67,7 @@ class ToyProblemSystemRealRoots(ToyProblemSystemOriginal):
         """
         number_of_samples = inputs.shape[0]
         states = np.zeros(shape=(number_of_samples + 1, 2))
-        outputs = np.zeros(shape=(number_of_samples + 1, 1))
+        outputs = np.zeros(shape=(number_of_samples, 1))
         for i in range(1, number_of_samples + 1):
             states[i, :] = self.state_matrix @ states[i - 1, :] + self.input_matrix @ inputs[i - 1, :]
         states = states[1::, :]
