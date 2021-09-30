@@ -18,8 +18,7 @@ STRUCT = {'state_length': NEURAL_NETWORK_STATE_LENGTH,
                          'ODNN_hidden_layer_2': 32,
                          'ODNN_output_layer': None},
           'forget_dnn_enable': True,
-          'output_dnn_enable': True,
-          'return_full_output': True
+          'output_dnn_enable': True
           }
 
 

@@ -10,13 +10,13 @@
         "number_of_test_samples": 100
     },
     "number_of_epochs": [
-        5,
+        1,
         2
     ],
     "batch_size": [
-        20,
+        100,
         100
     ],
-    "shuffle": true,
+    "shuffle": false,
     "number_of_repetitions": 5
 }

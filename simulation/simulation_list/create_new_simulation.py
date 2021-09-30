@@ -3,7 +3,7 @@ import os
 
 
 NEURAL_NETWORK_STATE_LENGTH = 5
-FILE_NAME = 'simulation_1.json'
+FILE_NAME = 'simulation_2.json'
 
 SIMULATION = {'description': 'Learning neural network with layer basic new GRU using data from basic toy problem',
               'simulation_type': 'newGRU',
@@ -11,13 +11,13 @@ SIMULATION = {'description': 'Learning neural network with layer basic new GRU u
               'structure_file': 'structure_1.json',
               'data_generator_name': 'toy_problem_original',
               'data_generator': {'data_file_name': 'toy_problem_v1',
-                                 'number_of_train_samples': 1000,
-                                 'number_of_test_samples': 300
+                                 'number_of_train_samples': 100,
+                                 'number_of_test_samples': 100
                                  },
-              'number_of_epochs': 100,
-              'batch_size': [20],
-              'shuffle': True,
-              'number_of_repetitions': 100,
+              'number_of_epochs': [1, 2],
+              'batch_size': [100, 100],
+              'shuffle': False,
+              'number_of_repetitions': 5,
               }
 
 
