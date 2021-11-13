@@ -15,12 +15,15 @@ class Result:
         self.number_of_train_sample = number_of_train_sample
         self.batch_size = None
         self.simulation_number = simulation_number
-        self.result_path = os.path.join(RESULT_DIR, self.problem_name + '_sim_' + str(simulation_number) + '.json')
-        self.plot_path = os.path.join(RESULT_DIR, self.problem_name + '_sim_' + str(simulation_number) + '.npz')
-        self.model_path = os.path.join(MODEL_DIR, self.problem_name + '_sim_' + str(simulation_number) + '.hdf5')
+        self.result_path = ''
+        self.plot_path = ''
+        self.model_path = ''
         self.data = None
 
     def save(self):
+        self.result_path = os.path.join(RESULT_DIR, self.problem_name + '_sim_' + str(self.simulation_number) + '.json')
+        self.plot_path = os.path.join(RESULT_DIR, self.problem_name + '_sim_' + str(self.simulation_number) + '.npz')
+        self.model_path = os.path.join(MODEL_DIR, self.problem_name + '_sim_' + str(self.simulation_number) + '.hdf5')
         information = {'problem name': self.problem_name,
                        'structure': self.structure,
                        'batch size': self.batch_size,

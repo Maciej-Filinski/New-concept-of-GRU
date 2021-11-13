@@ -14,15 +14,15 @@ class DataGenerator:
                  number_of_test_samples: int,
                  create: bool = False):
         self.__name__ = data_file_name
-        self.data_path_load = os.path.join(os.path.abspath('../New-concept-of-GRU/simulation/datasets'),
+        self.data_path_load = os.path.join(os.path.abspath('../simulation/datasets'),
                                            data_file_name + '.npz')
-        self.data_path_save = os.path.join(os.path.abspath('../New-concept-of-GRU/simulation/datasets'), data_file_name)
+        self.data_path_save = os.path.join(os.path.abspath('../simulation/datasets'), data_file_name)
         self.number_of_test_samples = number_of_test_samples
         self.number_of_train_samples = number_of_train_samples
         self.create = create
         self.data = {}
 
-    def load_data(self):
+    def load_data(self) -> dict:
         if self.create is True:
             self._create_data()
         elif os.path.exists(self.data_path_load) is True:
@@ -68,4 +68,7 @@ class DataGenerator:
         print('Data saved.')
 
     def _create_data(self):
-        raise Exception('Not define create_data function in child class')
+        raise Exception('Not define create_data function in child class\n'
+                        'if run main.py you have to build data before or\n'
+                        'number of train/test samples are to large -> build more data'
+                        'run simulation/datasets/build_all_datasets')

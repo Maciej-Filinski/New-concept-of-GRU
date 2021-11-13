@@ -19,6 +19,5 @@
         "ODNN_output_layer": null
     },
     "forget_dnn_enable": true,
-    "output_dnn_enable": true,
-    "return_full_output": true
+    "output_dnn_enable": true
 }

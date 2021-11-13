@@ -1,19 +1,19 @@
 from .data_generator import DataGenerator
-from system_definition import ToyProblemSystem, ToyProblemSystemV2, ToyProblemSystemV3
+from system_definition import ToyProblemSystemOriginal, ToyProblemSystemComplexRoots, ToyProblemSystemRealRoots
 import numpy as np
 
 
-class ToyProblem(DataGenerator):
+class ToyProblemOriginal(DataGenerator):
     number_of_inputs = 1
     number_of_outputs = 1
     scale = 1
 
     def __init__(self,
-                 number_of_train_samples: int,
-                 number_of_test_samples: int,
-                 dataset_name: str,
-                 random_seed=False):
-        self.system = ToyProblemSystem()
+                 number_of_train_samples: int = 0,
+                 number_of_test_samples: int = 0,
+                 dataset_name: str = '',
+                 random_seed: bool = False):
+        self.system = ToyProblemSystemOriginal()
         self.random_seed = random_seed
         if random_seed is True:
             super().__init__('toy_problem_random_seed', number_of_train_samples, number_of_test_samples, create=True)
@@ -32,22 +32,22 @@ class ToyProblem(DataGenerator):
         self._save_data()
 
 
-class ToyProblemV2(ToyProblem):
+class ToyProblemComplexRoots(ToyProblemOriginal):
     def __init__(self,
-                 number_of_train_samples: int,
-                 number_of_test_samples: int,
-                 dataset_name: str,
-                 random_seed=False):
+                 number_of_train_samples: int = 0,
+                 number_of_test_samples: int = 0,
+                 dataset_name: str = '',
+                 random_seed: bool = False):
         super().__init__(number_of_train_samples, number_of_test_samples, dataset_name,  random_seed=random_seed)
-        self.system = ToyProblemSystemV2()
+        self.system = ToyProblemSystemComplexRoots()
 
 
-class ToyProblemV3(ToyProblem):
+class ToyProblemRealRoots(ToyProblemOriginal):
     def __init__(self,
-                 number_of_train_samples: int,
-                 number_of_test_samples: int,
-                 dataset_name: str,
-                 random_seed=False):
+                 number_of_train_samples: int = 0,
+                 number_of_test_samples: int = 0,
+                 dataset_name: str = '',
+                 random_seed: bool = False):
         super().__init__(number_of_train_samples, number_of_test_samples, dataset_name,  random_seed=random_seed)
-        self.system = ToyProblemSystemV3()
+        self.system = ToyProblemSystemRealRoots()
 
